@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--Arquivo que sobrescreve a base para incluir a versão do software no menu da esquerda-->
+    <template id="crs_menu_secondary" name="" inherit_id="web.menu_secondary">
+         <xpath expr="div[@class='o_sub_menu_footer']" position="replace">
+             <div class="oe_footer" style="float:left;width:100%;">
+                 <p style="text-align: center;">Versão 2.2.1</p>
+             </div>
+         </xpath>
+     </template>
+</odoo>

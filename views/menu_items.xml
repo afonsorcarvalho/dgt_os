@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem name="Assistência Técnica" id="dgt_os_menu_root" web_icon="dgt_os,static/description/icon.png"/>
+
+		<!-- menu categories -->
+		<menuitem name="Serviços" id="dgt_os_menu_servicos" parent="dgt_os_menu_root" sequence="1"/>
+		<menuitem name="Equipamentos" id="dgt_os_menu_equipamentos" parent="dgt_os_menu_root" sequence="2"/>
+		<menuitem name="Relatórios" id="dgt_os_relatorio_equipamentos" parent="dgt_os_menu_root" sequence="3"/>
+        <menuitem name="Configuração" id="dgt_os_configuracoes" parent="dgt_os_menu_root" groups="base.group_no_one" sequence="10" />
+		
+		<menuitem name="Solicitações de Serviço"
+            action="action_window_request"
+            id="dgt_os_menu_2_list"
+            parent="dgt_os_menu_servicos"
+            sequence="1"/>
+
+		<menuitem name="Ordens de Serviço"
+            action="action_window_os"
+            id="dgt_os_menu_1_list"
+            parent="dgt_os_menu_servicos"
+            sequence="2"/>
+
+		<menuitem name="Relatórios de Atendimento"
+            action="action_window_relatorio_atendimento"
+            id="dgt_os_menu_3_list"
+            parent="dgt_os_menu_servicos"
+            sequence="3"/>
+		
+		<menuitem name="Clientes"
+			action="base.action_partner_form"
+			id="dgt_os_menu_4_list"
+			parent="dgt_os_menu_servicos"
+			sequence="4"/>	
+
+		<!--Menus pegados do modulo Maintenance-->
+
+		<menuitem
+        id="dgt_menu_equipment_form"
+        name="Equipamentos"
+        parent="dgt_os_menu_equipamentos"
+        action="action_window_dgt_equipment"
+        sequence="5"/>
+
+		<menuitem
+		id="dgt_menu_equipment_category_form"
+		name="Categoria de Equipamento"
+		parent="dgt_os_menu_equipamentos"
+		action="action_window_dgt_equipment_category"
+		sequence="6"/>
+
+		<menuitem
+		id="dgt_menu_equipment_maintenance_team"
+		name="Equipe de Manutenção"
+		parent="dgt_os_menu_equipamentos"
+		action="action_window_dgt_maintenance_team"
+		sequence="7"/>
+
+		<menuitem id="sale_saleperson_report"
+		name="Relatório OS"
+		action="action_dgt_os_report_wizard" 
+		parent="dgt_os_relatorio_equipamentos" 
+		sequence="8"/>
+		
+		<menuitem name="Itens de Pecas O.S."
+		action="action_window_os_pecas_line"
+		id="menu_dgt_os_os_pecas_line"
+		parent="dgt_os_configuracoes"
+		groups="base.group_no_one"
+		sequence="2"/>
+    </data>
+</odoo>

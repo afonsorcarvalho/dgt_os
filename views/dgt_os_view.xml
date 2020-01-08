@@ -1,0 +1,214 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<record model="ir.actions.act_window" id="action_window_os">
+		  <field name="name">Ordens de Serviço</field>
+		  <field name="type">ir.actions.act_window</field>
+		  <field name="res_model">dgt_os.os</field>
+		  <field name="limit">40</field>
+		  <field name="view_type">form</field>
+		  <field name="view_mode">tree,kanban,calendar,form,pivot,graph</field>
+		  <field name="help" type="html">
+			  <p class="oe_view_nocontent_create">
+				Clique para criar uma nova Ordem de Servico.
+			  </p>
+		  </field>
+		</record>
+		<record model="ir.actions.act_window" id="action_window_request">
+		  <field name="name">Solicitação de Serviço</field>
+		  <field name="type">ir.actions.act_window</field>
+		  <field name="res_model">dgt_os.os.request</field>
+		  <field name="limit">40</field>
+		  <field name="view_type">form</field>
+		  <field name="view_mode">tree,kanban,calendar,form,pivot,graph</field>
+		  <field name="help" type="html">
+			  <p class="oe_view_nocontent_create">
+				Clique para criar uma nova Solicitação de Serviço.
+			  </p>
+		  </field>
+		</record>
+		<record model="ir.actions.act_window" id="action_window_relatorio_atendimento">
+		  <field name="name">Relatório de Atendimento</field>
+		  <field name="type">ir.actions.act_window</field>
+		  <field name="res_model">dgt_os.os.relatorio.servico</field>
+		  <field name="limit">40</field>
+		  <field name="view_type">form</field>
+		  <field name="view_mode">tree,kanban,calendar,form,pivot,graph</field>
+		  <field name="help" type="html">
+			  <p class="oe_view_nocontent_create">
+				Clique para criar um novo Relatório de atendimento.
+			  </p>
+		  </field>
+		</record>
+		
+		<!-- explicit list view definition -->
+		<record model="ir.ui.view" id="dgt_os_list">
+		  <field name="name">dgt_os.os.list</field> 
+		  <field name="model">dgt_os.os</field> 
+		  <field name="arch" type="xml">
+			<tree   string="Ordens de Serviço"
+				default_order="name desc"
+				decoration-danger="maintenance_type =='corrective'"
+				decoration-info="maintenance_type == 'preventive'">
+
+			  <field name="state" string="Status"/> 
+			  <field name="create_date" string="Data Criação"/>
+			  <field name="name"/>
+			  <field name="cliente_id"/> 
+			  <field name="equipment_id"/>
+			  <field name="tecnicos_id" widget="many2many_tags"/>
+			  <field name="date_execution" string="Dt. Execução"/>
+			  <field name="maintenance_type" string="Tipo Manutenção"/>
+			</tree>
+		  </field>
+		</record>
+		<!-- explicit calendar view definition -->
+		<record id="dgt_os_calendar" model="ir.ui.view">
+			<field name="name">dgt_os.os.calendar</field>
+			<field name="model">dgt_os.os</field>
+			<field name="arch" type="xml">
+				<calendar date_start="date_scheduled" color="cliente_id">
+					<field name="name"/>
+					<field name="cliente_id"/>
+					<field name="equipment_id"/>
+				</calendar>
+			</field>
+		</record>
+		<record id="dgt_os_relatorio_atendimento_calendar" model="ir.ui.view">
+			<field name="name">dgt_os.os.relatorio.atendimento.calendar</field>
+			<field name="model">dgt_os.os.relatorio.servico</field>
+			<field name="arch" type="xml">
+				<calendar date_start="create_date" color="os_id">
+					<field name="name"/>
+					<field name="os_id"/>
+					<field name="cliente_id"/>
+					<field name="equipment_id"/>
+				</calendar>
+			</field>
+		</record>
+		<!-- explicit kanban view definition -->
+		<record model="ir.ui.view" id="dgt_os_kanban">
+			<field name="name">dgt_os.os.kanban</field> 
+			<field name="model">dgt_os.os</field> 
+			<field name="arch" type="xml">
+				<kanban default_group_by="state">
+					<field name="state"/> 
+					<field name="priority"/>
+					<field name="equipment_id" />
+					<field name="cliente_id" />
+					<field name="tecnicos_id" />
+					<field name="date_execution" />
+					<templates>
+						<t t-name="kanban-tooltip">
+						   <ul class="oe_kanban_tooltip">
+							  <li><b>Cliente:</b> <field name="cliente_id"/></li>
+						   </ul>
+						</t>
+						<t t-name="kanban-box">
+							<div>
+								<div class="o_dropdown_kanban dropdown">
+
+									<a class="dropdown-toggle btn" data-toggle="dropdown" href="#" >
+										<span class="fa fa-bars fa-lg"/>
+									</a>
+									<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+										<t t-if="widget.editable"><li><a type="edit">Edit...</a></li></t>
+										<t t-if="widget.deletable"><li><a type="delete">Delete</a></li></t>
+									</ul>
+								</div>
+								<div class="oe_kanban_content" tooltip="kanban-tooltip">
+									<div>
+										<b><field name="name"/></b> <br/>
+										<span name="cliente_id" t-if="record.cliente_id.raw_value"><field name="cliente_id"/><br/></span>
+										<span class="oe_grey" t-if="record.equipment_id"><field name="equipment_id" /><br/></span>
+									</div>
+									<div class="oe_kanban_footer_left" style="margin-top:2px;">
+										<t t-if="record.message_needaction_counter">
+											<span class='oe_kanban_mail_new' title='Unread Messages'><i class='fa fa-comments'/><t t-raw="record.message_needaction_counter"/></span>
+										</t>
+										
+									</div>
+									<div class="oe_kanban_bottom_left">
+										<div class="pull-left" groups="base.group_user">
+											 <field name="date_execution" />
+										</div>
+									</div>
+									<div class="oe_kanban_bottom_right">
+										<img t-att-src="kanban_image('res.partner', 'image_small', record.cliente_id.raw_value)" t-att-title="record.cliente_id.value" width="24" height="24" class="oe_kanban_avatar pull-right"/>
+										<div class="pull-left" groups="base.group_user">
+											 <field name="priority" widget="priority"/>
+										</div>
+									</div>
+								</div>
+								<div class="oe_clear"></div>
+							</div>
+						</t>
+					</templates>
+				</kanban>
+			</field>
+		</record>
+		
+
+	
+	
+	<!-- Filtros para as Ordem de serviços -->
+	<record id="view_filter" model="ir.ui.view">
+    <field name="name">dgt_os.os.view.filter</field>
+    <field name="model">dgt_os.os</field>
+    <field name="arch" type="xml">
+      <search string="Procurar Ordens de Serviço">
+        <field name="name" string="Ordem de Serviços" filter_domain="[('name','ilike',self)]"/>
+        <field name="tecnicos_id"/>
+        <field name="equipment_id"/>
+        <field name="cliente_id"/>
+				<field name="create_date"/>
+				<field name="date_execution"/>
+				<field name="state"/>
+				<field name="tecnicos_id"/>
+				<field name="priority"/>
+				<field name="maintenance_type"/>
+        <filter string="Minhas Ordens de Serviço" domain="[('tecnicos_id','=',uid)]" name="minhas_ordem_servico_filter"/>
+        <separator/>
+				<filter string="Corretivas" domain="[('maintenance_type','=','corrective')]" name="ordem_servico_corretiva_filter"/>
+				<filter string="Preventivas" domain="[('maintenance_type','=','preventive')]" name="ordem_servico_preventiva_filter"/>
+				<filter string="Instalação" domain="[('maintenance_type','=','instalacao')]" name="ordem_servico_instalacao_filter"/>
+				<separator/>
+				<filter string="Não Concluídas" domain="[('state','!=','done'),('state','!=','reprovado')]" name="ordem_servico_nao_concluidas_filter"/>
+				<filter string="Concluídas" domain="[('state','=','done')]" name="ordem_servico_concluidas_filter"/>
+				<filter string="À Faturar" domain="[('state','=','2binvoiced')]" name="ordem_servico_a_faturar_filter"/>
+				<filter string="Esperando Peças" domain="[('state','=','released')]" name="ordem_servico_esperando_pecas_filter"/>
+				<separator/>
+				<filter string="Alta Prioridade" domain="[('priority','=','3')]" name="ordem_servico_prioridade_alta_filter"/>
+				<filter string="Média Prioridade" domain="[('priority','=','2')]" name="ordem_servico_prioridade_media_filter"/>
+				<filter string="Baixa Prioridade" domain="[('priority','=','1')]" name="ordem_servico_prioridade_baixa_filter"/>
+				<separator/>
+        <filter string="Mensagens não lidas" name="message_needaction" domain="[('message_needaction','=',True)]"/>
+        <group expand="0" string="Group By">
+          <filter string="Cliente" name="client" domain="[]" context="{'group_by':'cliente_id'}"/>
+					<filter string="Equipamento" name="equipment_id"  domain="[]" context="{'group_by':'equipment_id'}"/>
+      		<filter string="Mes" name="month" domain="[]" context="{'group_by':'date_execution'}"/> 
+					<filter string="Status" name="status" domain="[]" context="{'group_by':'state'}"/>
+					<filter string="Tipo" name="type" domain="[]" context="{'group_by':'maintenance_type'}"/>
+					<filter string="Prioridade" name="priority" domain="[]" context="{'group_by':'priority'}"/>
+      	</group>
+      </search>
+    </field>
+  </record>
+	
+	<!-- explicit pivot view definition -->
+		<record model="ir.ui.view" id="ordem_servico_pivot">
+            <field name="name">dgt_os.os.pivot</field>
+            <field name="model">dgt_os.os</field>
+            <field name="arch" type="xml">
+                <pivot string="Ordem de Serviços" display_quantity="True">
+                    <field name="cliente_id" type="row"/>
+					<field name="state" type="col"/> 
+					<field name="time_execution" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+			
+	
+		
+	</data>
+</odoo>

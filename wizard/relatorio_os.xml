@@ -1,0 +1,45 @@
+<odoo>
+    <data>
+         <record id="dgt_os_report_view" model="ir.ui.view">
+            <field name="name">Relatório Wizard</field>
+            <field name="model">dgt_os.os.report.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <field invisible="1" name="state"/>
+                    <group attrs="{'invisible':[('state','=','get')]}">
+                        <field name="filter_model" />
+                    </group>
+
+                    <group attrs="{'invisible':[('state','=','get')]}">
+                        <field name="date_from" />
+                        <field name="date_to" />
+                    </group>
+
+                    <div states="get">
+                        <group>
+                            <field name="name" colspan="4" invisible="1"/>
+                            <field name="report" filename="name" colspan="4"/>
+                        </group>
+                    </div>
+
+                    <footer attrs="{'invisible':[('state','=','get')]}">
+                        <button name="check_report"
+                            string="Imprimir" type="object"
+                            class="oe_highlight" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_dgt_os_report_wizard" model="ir.actions.act_window">
+    		<field name="name">Gera relatórios para OS</field>
+    		<field name="res_model">dgt_os.os.report.wizard</field>
+    		<field name="type">ir.actions.act_window</field>
+    		<field name="view_type">form</field>
+    		<field name="view_mode">form</field>
+    		<field name="view_id" ref="dgt_os_report_view"/>
+    		<field name="target">new</field>
+		</record>
+
+    </data>
+</odoo> 

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data>
+<template id="dgt_os_email_template">
+
+   Segue em anexo a <bold>Ordem de Serviço ${object.name}</bold> que foi realizada no dia <bold>${object.date_execution}</bold>
+
+        <p>Best regards,
+        <br/>
+        Librarian
+    </p>
+</template>
+</data>
