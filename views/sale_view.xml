@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<!-- Inherit Form view -->
+<record id="dgt_sale_order_form" model="ir.ui.view">
+    <field name="name">dgt_sale.order.form</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form" />
+    <field name="arch" type="xml">
+        <field name="partner_id" position="after">
+            <field name="os_id"/>
+            <!-- Add your fields or attributes here -->
+        </field>
+    </field>
+</record>
+
+<record id="dgt_view_sales_order_filter" model="ir.ui.view">
+    <field name="name">dgt_sale.order.list.select</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_sales_order_filter" />
+    <field name="arch" type="xml">
+        <field name="partner_id" position="after">
+            <field name="os_id"/>
+            <filter string="Ordem de serviços" domain="[('os_id','!=',False)]" name="os_filter"/>
+            <!-- Add your fields or attributes here -->
+        </field>
+        
+    </field>
+</record>
+</odoo>
