@@ -6,3 +6,4 @@ from . import dgt_os_peca_line
 from . import emails
 from . import os_verify_list
 from . import equipments
+from . import sale

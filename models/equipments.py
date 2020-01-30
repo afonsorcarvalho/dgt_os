@@ -64,7 +64,7 @@ class Equipment(models.Model):
     partner_id = fields.Many2one('res.partner', 'Fornecedor')
     partner_reference = fields.Char('Referência de Fornecedor')
     model = fields.Char('Modelo')
-    serial_number = fields.Char('Número de Série')
+    serial_number = fields.Char('Número de Série', copy = False)
     anvisa_code = fields.Char('Reg Anvisa')
     tag = fields.Char('Tag')
     patrimony = fields.Char('Patrimonio')
@@ -81,8 +81,8 @@ class Equipment(models.Model):
 
     _sql_constraints = [
 		('serial_no_uniq', 
-		'UNIQUE (serial_number)', 
-		'Número de série deve ser único!') 
+		'UNIQUE (serial_number,partner_id)', 
+		'Número de série para cada fabricante deve ser único!') 
 	]
     @api.multi
     def name_get(self):
@@ -94,4 +94,15 @@ class Equipment(models.Model):
                                 result.append((record.id, record.name))
                 return result
     
+    @api.model
+    def name_search(self, name, args=None, operator='ilike', limit=100):
+        args = args or []
+        
+        if operator == 'ilike' and not (name or '').strip():
+                recs = self.search([] + args, limit=limit)
+        elif operator in ('ilike', 'like', '=', '=like', '=ilike'):
+                recs = self.search(['|','|',('name', operator, name),('id', operator, name),('serial_number', operator, name)] + args, limit=limit)
+        
+        return recs.name_get()
+        
 

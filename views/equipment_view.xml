@@ -9,7 +9,30 @@
 				target="current"
 				limit="40"
 			/>
-
+		<record id="view_dgt_equipment_filter" model="ir.ui.view">
+            <field name="name">dgt_os.equipment.list.select</field>
+            <field name="model">dgt_os.equipment</field>
+            <field name="priority" eval="15"/>
+            <field name="arch" type="xml">
+                <search string="Procura Equipamentos">
+                    <field name="name" string="Equipamento" filter_domain="['|',('name','ilike',self),('serial_number','ilike',self)]" />
+					<field name="serial_number" filter_domain="[('serial_number','ilike',self)]"/>
+					<field name="client_id" />
+					<field name="tag"/>
+					<field name="patrimony"/>
+					<field name="partner_id"/>
+					
+                   
+                    <group expand="0" string="Group By">
+                        
+						<filter name="Modelo" string="Modelo" domain="[]" context="{'group_by':'model'}"/>
+                        <filter name="Cliente" string="Cliente" domain="[]" context="{'group_by':'client_id'}"/>
+						<filter name="Fornecedor" string="Fornecedor" domain="[]" context="{'group_by':'partner_id'}"/>
+                    
+                    </group>
+               </search>
+            </field>
+        </record>
 			<!-- View do Formulário de Cadastro dos Equipamentos -->
 			<record id="view_form_dgt_os_equipment" model="ir.ui.view">
 				<field name="name">dgt_os.equipment.form</field>
@@ -103,18 +126,19 @@
 			<field name="arch" type="xml">
 				<tree string="Equipamentos">
 					<field name="name" />
+					<field name="serial_number" />
+					<field name="partner_id" />
+					<field name="model" />
 					<field name="client_id" />
 					<field name="patrimony" />
 					<field name="tag" />
-					<field name="model" />
-					<field name="partner_id" />
 					<field name="situation_id" />
 					<field name="location_id" />
 				</tree>
 			</field>
 		</record>
 		
-		<record id="view_kanban_dgt_os_equipment" model="ir.ui.view">
+<!--	<record id="view_kanban_dgt_os_equipment" model="ir.ui.view">
 			<field name="name">dgt_os.equipment.kanban</field> 
 			<field name="model">dgt_os.equipment</field> 
 			<field name="arch" type="xml">
@@ -163,7 +187,7 @@
                 </search>
             </field>
         </record>
-			
+			-->	
 
     </data>
 </odoo>

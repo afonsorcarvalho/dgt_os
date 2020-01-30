@@ -29,6 +29,7 @@
 		'security/at_security.xml',
 	    'security/ir.model.access.csv',
         'wizard/relatorio_os.xml',
+        'views/sale_view.xml',
 		'views/dgt_os_pecas_line_view.xml',
 		'views/dgt_os_view.xml',
 		'views/dgt_os_request_view.xml',

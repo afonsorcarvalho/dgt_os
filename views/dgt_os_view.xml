@@ -91,7 +91,7 @@
 			<field name="name">dgt_os.os.kanban</field> 
 			<field name="model">dgt_os.os</field> 
 			<field name="arch" type="xml">
-				<kanban default_group_by="state">
+				<kanban default_group_by="state" >
 					<field name="state"/> 
 					<field name="priority"/>
 					<field name="equipment_id" />
@@ -112,8 +112,8 @@
 										<span class="fa fa-bars fa-lg"/>
 									</a>
 									<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-										<t t-if="widget.editable"><li><a type="edit">Edit...</a></li></t>
-										<t t-if="widget.deletable"><li><a type="delete">Delete</a></li></t>
+										<t t-if="widget.editable"><li><a type="edit"> Edit...</a></li></t>
+										<t t-if="widget.deletable"><li><a type="delete"> Delete</a></li></t>
 									</ul>
 								</div>
 								<div class="oe_kanban_content" tooltip="kanban-tooltip">
