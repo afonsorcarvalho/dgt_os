@@ -8,7 +8,7 @@
                 <form string="Ordens de Serviço">
                     <header>
                         <button name="action_done" type="object" string="Concluir OS" class="oe_highlight" attrs="{'invisible':True}"/>
-                        <button name="action_agente" type="object" string="Testar agente" class="oe_highlight" />
+                        <!-- <button name="action_agente" type="object" string="Testar agente" class="oe_highlight" /> -->
                         <button name="action_quotation_start" type="object" string="Iniciar Orçamento" class="oe_highlight" attrs="{'invisible':[('state', 'not in',('draft','pause_budget'))]}" />
                         <button name="action_repair_executar" type="object" string="Iniciar Execução" class="oe_highlight" attrs="{'invisible':[('state', 'not in',('draft','execution_ready','pause_repair'))]}" />
                         <button name="action_quotation_end" type="object" class="oe_highlight" string="Finalizar Orçamento" attrs="{'invisible':[('state', 'not in',('under_budget'))]}" />
