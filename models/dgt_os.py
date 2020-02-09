@@ -438,13 +438,21 @@ class DgtOs(models.Model):
             else:
                 _logger.debug("Não foi achado tecnico nome: %s, partner name: %s",tec.name,rec.name )
                 
-
+    @api.multi
+    def finish_report(self):
+        _logger.debug("Procurando relatorios...")
+        if self.relatorios:
+            for rec in self.relatorios:
+                rec.state = 'done'
+        return True
+    
     #utilizado na venda para atorizar Ordem de serviço        
     @api.multi
     def approve(self):
         _logger.debug("Mudando state da os %s",self.name)
         for item in self:
-            item.write({'state': 'execution_ready'})
+            if item.state not 'done':
+                item.write({'state': 'execution_ready'})
         _logger.debug("os state=%s ", self.state)
         
     #TODO Colocar também o técnico que irá receber a comissão 
@@ -577,7 +585,8 @@ class DgtOs(models.Model):
     @api.multi
     def action_repair_aprove(self):
         self.message_post(body='Aprovado orçamento da ordem de serviço!')
-        res = self.write({'state': 'execution_ready'})
+        if self.state not 'done':
+            res = self.write({'state': 'execution_ready'})
         return res
 
     @api.multi
@@ -640,6 +649,8 @@ class DgtOs(models.Model):
                 _logger.debug("Concluída Solicitação")
             else:
                 _logger.debug("Não existe solicitação para OS. Continuando...")
+            _logger.debug("Finalizando relatorios.")
+            self.finish_report()
             return True
         else:
             _logger.debug("Erro ao atualizar OS.")
