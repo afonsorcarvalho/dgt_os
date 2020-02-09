@@ -388,8 +388,11 @@ class DgtOs(models.Model):
     
     def set_agente_commission(self):
         _logger.debug("pegando agente comissão")
+       
         for tec in self.tecnicos_id:
             rec = self.env['res.partner'].search([('name', '=',tec.name )], offset=0, limit=None, order=None, count=False)
+            if len(rec) <= 0:
+                raise UserError(_("Não foi encontrado nenhum técnico para comissionar. "))
             if rec.id:
                 _logger.debug("Achado tecnico nome: %s, partner name: %s",tec.name,rec.name )
                 if rec.agent:
@@ -624,14 +627,24 @@ class DgtOs(models.Model):
                 'date_execution': time.strftime('%Y-%m-%d %H:%M:%S'),
         }
         #self.action_repair_done()
-        self.write(vals)
-        if self.sale_id.id:
-            _logger.debug("Cotação já foi gerada: %s",self.sale_id.name)
+        res = self.write(vals)
+        if res:
+            if self.sale_id.id:
+                _logger.debug("Cotação já foi gerada: %s",self.sale_id.name)
+            else:
+                _logger.debug("Cotação ainda não gerada. Gerando...")
+                self.gera_orcamento()
+                
+            if self.request_id.id:    
+                self.request_id.action_finish_request()
+                _logger.debug("Concluída Solicitação")
+            else:
+                _logger.debug("Não existe solicitação para OS. Continuando...")
+            return True
         else:
-            _logger.debug("Cotação ainda não gerada. Gerando...")
-            self.gera_orcamento()
-            
-        self.request_id.action_finish_request()
+            _logger.debug("Erro ao atualizar OS.")
+            return False
+       
 
     def create_checklist(self):
         """Cria a lista de verificacao caso a os seja preventiva."""
