@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Esse serve apenas pra tirar a trava na categoria colocada pelo modulo br_product da trustcode -->
+<odoo>
+    <data>
+        <record id="view_dgt_product_category_form" model="ir.ui.view">
+            <field name="name">view.dgt_product.category.form</field>
+            <field name="model">product.category</field>
+            <field name="inherit_id" ref="br_product.view_br_product_category_form"/>
+            <field name="arch" type="xml">
+                <field name="property_account_income_categ_id" position="attributes" >
+                    <!-- Esse carinha apenas adiciona o filtro do
+                    'account_type' nos fields da categoria -->
+                    <attribute name="domain">[('account_type', '=', 'income'),
+                                              ('deprecated', '=', False)]</attribute>
+                </field>
+                <field name="property_account_expense_categ_id" position="attributes">
+                    <attribute name="domain">[('account_type', '=', 'expense'),
+                                              ('deprecated', '=', False)]</attribute>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>
