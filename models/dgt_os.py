@@ -388,8 +388,11 @@ class DgtOs(models.Model):
     
     def set_agente_commission(self):
         _logger.debug("pegando agente comissão")
+       
         for tec in self.tecnicos_id:
             rec = self.env['res.partner'].search([('name', '=',tec.name )], offset=0, limit=None, order=None, count=False)
+            if len(rec) <= 0:
+                raise UserError(_("Não foi encontrado nenhum técnico para comissionar. "))
             if rec.id:
                 _logger.debug("Achado tecnico nome: %s, partner name: %s",tec.name,rec.name )
                 if rec.agent:
@@ -435,13 +438,21 @@ class DgtOs(models.Model):
             else:
                 _logger.debug("Não foi achado tecnico nome: %s, partner name: %s",tec.name,rec.name )
                 
-
+    @api.multi
+    def finish_report(self):
+        _logger.debug("Procurando relatorios...")
+        if self.relatorios:
+            for rec in self.relatorios:
+                rec.state = 'done'
+        return True
+    
     #utilizado na venda para atorizar Ordem de serviço        
     @api.multi
     def approve(self):
         _logger.debug("Mudando state da os %s",self.name)
         for item in self:
-            item.write({'state': 'execution_ready'})
+            if item.state not 'done':
+                item.write({'state': 'execution_ready'})
         _logger.debug("os state=%s ", self.state)
         
     #TODO Colocar também o técnico que irá receber a comissão 
@@ -574,7 +585,8 @@ class DgtOs(models.Model):
     @api.multi
     def action_repair_aprove(self):
         self.message_post(body='Aprovado orçamento da ordem de serviço!')
-        res = self.write({'state': 'execution_ready'})
+        if self.state not 'done':
+            res = self.write({'state': 'execution_ready'})
         return res
 
     @api.multi
@@ -624,14 +636,26 @@ class DgtOs(models.Model):
                 'date_execution': time.strftime('%Y-%m-%d %H:%M:%S'),
         }
         #self.action_repair_done()
-        self.write(vals)
-        if self.sale_id.id:
-            _logger.debug("Cotação já foi gerada: %s",self.sale_id.name)
+        res = self.write(vals)
+        if res:
+            if self.sale_id.id:
+                _logger.debug("Cotação já foi gerada: %s",self.sale_id.name)
+            else:
+                _logger.debug("Cotação ainda não gerada. Gerando...")
+                self.gera_orcamento()
+                
+            if self.request_id.id:    
+                self.request_id.action_finish_request()
+                _logger.debug("Concluída Solicitação")
+            else:
+                _logger.debug("Não existe solicitação para OS. Continuando...")
+            _logger.debug("Finalizando relatorios.")
+            self.finish_report()
+            return True
         else:
-            _logger.debug("Cotação ainda não gerada. Gerando...")
-            self.gera_orcamento()
-            
-        self.request_id.action_finish_request()
+            _logger.debug("Erro ao atualizar OS.")
+            return False
+       
 
     def create_checklist(self):
         """Cria a lista de verificacao caso a os seja preventiva."""
