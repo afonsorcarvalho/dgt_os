@@ -133,11 +133,7 @@ class DgtOs(models.Model):
         related='cliente_id.email',
         readonly=True
     )
-    cliente_email_manutencao = fields.Char(
-        'E-mail do cliente para enviar as Ordens de Serviço',
-        related='cliente_id.maintenance_email',
-        readonly=True
-    )
+    
     cliente_cidade = fields.Char(
         'Cidade do cliente',
         related='cliente_id.city_id.name',
@@ -451,7 +447,7 @@ class DgtOs(models.Model):
     def approve(self):
         _logger.debug("Mudando state da os %s",self.name)
         for item in self:
-            if item.state not 'done':
+            if item.state != 'done':
                 item.write({'state': 'execution_ready'})
         _logger.debug("os state=%s ", self.state)
         
@@ -585,7 +581,7 @@ class DgtOs(models.Model):
     @api.multi
     def action_repair_aprove(self):
         self.message_post(body='Aprovado orçamento da ordem de serviço!')
-        if self.state not 'done':
+        if self.state != 'done':
             res = self.write({'state': 'execution_ready'})
         return res
 

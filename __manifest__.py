@@ -22,7 +22,7 @@
     # for the full list
    
     # any module necessary for this one to work correctly
-    'depends': ['base','sale','stock', 'account','br_account','br_account_einvoice', 'mail', 'web', 'hr'],
+    'depends': ['br_base','br_sale','stock','sale_management','sale_commission' ,'br_product','account','br_account', 'mail', 'utm','portal','web', 'hr'],
 
     # always loaded 
     'data': [
