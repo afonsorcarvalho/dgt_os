@@ -43,6 +43,7 @@
        	'reports/report_base_ordem.xml',
 	    'reports/report_ordem_servico.xml',
 	    'reports/report_orcamento_servico.xml',
+        'reports/sale_report_views.xml',
         'email_template/dgt_os_email_template.xml',
 		'data/ir_sequence_data.xml',
     ],
