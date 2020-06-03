@@ -7,3 +7,4 @@ from . import emails
 from . import os_verify_list
 from . import equipments
 from . import sale
+from . import res_partner
