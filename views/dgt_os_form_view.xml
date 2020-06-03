@@ -47,7 +47,9 @@
                             <group>
                                 <field name="cliente_id" attrs="{'readonly':[('state','not in','draft')]}" />
                                 <field name="equipment_id" attrs="{'readonly':[('state','not in','draft')]}" domain="[('client_id.id', '=', cliente_id)]" />
+                                <field name="equipment_location"  />
                                 <field name="priority" widget="priority"/>
+                                <field name="gerado_cotacao" groups="base.group_no_one"/>
 
 
 
@@ -226,6 +228,16 @@
                                     </tree>
 
                                 </field>
+                            </page>
+                            <page string="Assinatura">
+                            <group>
+                            <field name="name_digital_signature_client"  attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}"/>
+                            <field name="signature_client_date" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}" />
+                            <field name="sign_client"/>
+                            </group>
+                                <group>
+                                    <field name="digital_signature_client" widget="signature"  attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}"/>
+                                </group>
                             </page>
                         </notebook>
                     </sheet>

@@ -19,7 +19,7 @@
 
 
         <!-- QWeb Reports -->
-        <report 
+    <!--    <report 
             id="ordem_servico_report"
             model="dgt_os.os"
             string="Ordem de Serviço"
@@ -41,7 +41,7 @@
             print_report_name = "('Orçamento ' + object.name)"
         />
 
-       
+       -->
     </data>
 </odoo>
 

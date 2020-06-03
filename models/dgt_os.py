@@ -36,6 +36,7 @@ class DgtOs(models.Model):
         ('qualification', 'Qualificação'),
         ('loan', 'Comodato'),
         ('calibration', 'Calibração'),
+      
     ]
 
     GARANTIA_SELECTION = [
@@ -133,7 +134,11 @@ class DgtOs(models.Model):
         related='cliente_id.email',
         readonly=True
     )
-    
+   # cliente_email_manutencao = fields.Char(
+   #     'E-mail do cliente para enviar as Ordens de Serviço',
+   #     related='cliente_id.maintenance_email',
+   #     readonly=True
+   # )
     cliente_cidade = fields.Char(
         'Cidade do cliente',
         related='cliente_id.city_id.name',
@@ -198,12 +203,14 @@ class DgtOs(models.Model):
         index=True, required=True,
         help='Escolha o equipamento referente a Ordem de Servico.'
         )
+    equipment_location = fields.Many2one( string = 'Setor de Uso',related='equipment_id.location_id', store=True)
     description = fields.Text(required=True, help="Descrição do serviço realizado ou a ser relalizado")
     procurement_group_id = fields.Many2one('procurement.group', 'Procurement group', copy=False)
     #qr = fields.Text('Qr code',compute='_gera_qr',readonly=True)
     analytic_account_id = fields.Many2one('account.analytic.account', string="Conta analítica", )
     fiscal_position_id = fields.Many2one('account.fiscal.position', string='Posição Fiscal',  required=False,help='Posição fiscal para faturamento')
     check_list = fields.One2many('dgt_os.os.verify.list', 'dgt_os',track_visibility='onchange')
+    check_list_created = fields.Boolean('Check List Created', track_visibility='onchange', default=False)
     equipment_category = fields.Char(
         'Categoria do Equipamento',
         related='equipment_id.category_id.name',
@@ -234,7 +241,27 @@ class DgtOs(models.Model):
         related='equipment_id.patrimony',
         readonly=True
     )
+     # assinatura digital
+    name_digital_signature_client = fields.Char(
+        string=u'Nome do Cliente Assinatura',
+    )
+    signature_client_date = fields.Datetime(string="Data Assinatura do Cliente", default=time.strftime('%Y-%m-%d %H:%M:%S'),track_visibility='onchange')
+    sign_client  = fields.Boolean(
+        string='Assinado pelo cliente'
+    )
     
+    doc_digital_signature_client = fields.Char(
+        string=u'Documento do Cliente Assinatura',
+    )
+
+    digital_signature_client = fields.Binary(string='Assinatura Cliente')
+    gerado_cotacao = fields.Boolean(
+        string=u'Cotação gerada?',
+    )
+
+    def set_sign_client(self):
+        self.sign_client = 1
+
     @api.multi
     @api.depends('relatorios')
     def _compute_time_execution(self):
@@ -253,6 +280,12 @@ class DgtOs(models.Model):
     @api.onchange('date_scheduled')
     def onchange_scheduled_date(self):
         self.date_execution = self.date_scheduled
+    
+    @api.onchange('digital_signature_client')
+    def onchange_digital_signature_client(self):
+        self.signature_client_date = time.strftime('%Y-%m-%d %H:%M:%S')
+        self.set_sign_client()
+        
 
     @api.onchange('date_execution')
     def onchange_execution_date(self):
@@ -265,12 +298,15 @@ class DgtOs(models.Model):
     def onchange_maintenance_duration(self):
         _logger.debug("maintenance_duration mudado")
         _logger.debug("Ordem de serviço %s", self.name)
-        rec = self.env['dgt_os.os.servicos.line'].search([('os_id', '=', self.id )])
-        _logger.debug(rec)
-        rec.write({
-            'product_uom_qty': self.maintenance_duration
-        })
-        _logger.debug(rec)
+        rec = self.servicos
+        for r in rec:
+            _logger.debug("Serviços %s", r.name)
+            if r.automatic:
+                _logger.debug("Este foi colocado automaticamente")
+                _logger.debug("Mudando a quantidade para %s",self.maintenance_duration)
+                r.product_uom_qty = self.maintenance_duration
+            else:
+                _logger.warning("Nenhum serviço adicionado automaticamente")
         
     @api.onchange('tecnicos_id')
     def onchange_tecnicos_id(self):
@@ -459,7 +495,12 @@ class DgtOs(models.Model):
             raise UserError(_("Cotação para esse Ordem de serviço já foi gerada"))
         if not len(self.servicos):
             raise UserError(_("Para gerar cotação deve ter pelo menos um serviço adicionado"))
-                     
+        if self.state == 'under_budget':
+            _logger.debug("Ordem de serviço em orçamento")    
+            _logger.debug("Procura serviço para atualizar tempo")
+            
+          
+                        
         _logger.debug("posicão fiscal: %s",self.fiscal_position_id.name)
         _logger.debug("Conta Analítica: %s",self.analytic_account_id.name )
         _logger.debug("Gerando cotação para %s:",self.name)
@@ -560,6 +601,7 @@ class DgtOs(models.Model):
     def action_quotation_start(self):
         self.message_post(body='Iniciada orçamento da ordem de serviço!')
         self.quotation_relatorio_service_start()
+        _logger.debug("Iniciando Orçamento")
         res = self.write({'state': 'under_budget', 'date_start_quotation': time.strftime('%Y-%m-%d %H:%M:%S')})
         return res
 
@@ -589,7 +631,9 @@ class DgtOs(models.Model):
     def action_repair_executar(self):
         
         self.verify_execution_rules()
-        self.create_checklist()
+        if self.state == 'draft' or self.state == 'execution_ready':
+            _logger.debug("Criando Check List")
+            self.create_checklist()
         self.message_post(body='Iniciada execução da ordem de serviço!')
         res = self.write({'state': 'under_repair', 'date_start': time.strftime('%Y-%m-%d %H:%M:%S')})
         return res
@@ -626,7 +670,14 @@ class DgtOs(models.Model):
         if not self.relatorios:	
             raise UserError(_("Para finalizar O.S. deve-se incluir pelo menos um relatório de serviço."))
             return False
-
+        
+        if self.check_list_created:
+            for check in self.check_list:	
+                if not check.check:
+                    raise UserError(_("Para finalizar O.S. todas as instruções do check-list devem estar concluídas"))
+                    return False
+                    
+        
         vals = {
                 'state': 'done',
                 'date_execution': time.strftime('%Y-%m-%d %H:%M:%S'),
@@ -655,13 +706,17 @@ class DgtOs(models.Model):
 
     def create_checklist(self):
         """Cria a lista de verificacao caso a os seja preventiva."""
-        if self.maintenance_type == 'preventive' or self.maintenance_type == 'loan' or self.maintenance_type == 'calibration':
+        if self.maintenance_type == 'preventive' or self.maintenance_type == 'loan' or self.maintenance_type == 'calibration' :
+            _logger.debug("Criando Checklis")
             instructions = self.env['maintenance.equipment.category.vl'].search([('category_id.name', '=', self.equipment_id.category_id.name)])
             os_check_list = self.env['dgt_os.os.verify.list'].search([('category_id.name', '=', self.equipment_id.category_id.name)])
             
 
             for i in instructions:
-                os_check_list.create({'dgt_os': self.id, 'instruction': str(i.name)})
+                instructions =os_check_list.create({'dgt_os': self.id, 'instruction': str(i.name)})
+                _logger.debug(instructions)
+                
+            self.check_list_created = True
 
 class ServicosLine(models.Model):
     _name = 'dgt_os.os.servicos.line'
@@ -675,7 +730,7 @@ class ServicosLine(models.Model):
     to_invoice = fields.Boolean('Faturar')
     product_id = fields.Many2one('product.product', u'Serviço',domain=[('type','=','service')], required=True)
     invoiced = fields.Boolean('Faturada', copy=False, readonly=True)
-    automatic = fields.Boolean('Gerado automático', copy=False, readonly=True, default=False)
+    automatic = fields.Boolean('Gerado automático', copy=False,  default=False)
     tax_id = fields.Many2many(
         'account.tax', 'dgt_os_service_line_tax', 'dgt_os_service_line_id', 'tax_id', 'Impostos')
     product_uom_qty = fields.Float(
@@ -716,7 +771,7 @@ class RelatoriosServico(models.Model):
     _inherit = ['mail.thread']
     _order = 'data_atendimento'
 
-    date_now = datetime.now()
+    date_now = fields.datetime.now()
     name = fields.Char(
         'Nº Relatório de Serviço',default=lambda self: self.env['ir.sequence'].next_by_code('dgt_os.os.relatorio'),
         copy=False, required=True)
@@ -732,9 +787,9 @@ class RelatoriosServico(models.Model):
     observations = fields.Char(string='Observações')
     
     relatorio_num = fields.Char('Nº Relatório')
-    data_atendimento = fields.Date('Data atendimento', required=True, default=fields.Date.today() )
-    hora_inicio = fields.Float('Hora de início', default = float(fields.Datetime.now().hour) + float(fields.Datetime.now().minute)/60, required=True)
-    hora_termino = fields.Float('Hora de termino',default = float(fields.Datetime.now().hour + 1) + float(fields.Datetime.now().minute)/60, required=True)
+    data_atendimento = fields.Date('Data atendimento', required=True, default=fields.date.today() )
+    hora_inicio = fields.Float('Hora de início', default = float(fields.datetime.now().hour) + float(fields.datetime.now().minute)/60, required=True)
+    hora_termino = fields.Float('Hora de termino',default = float(fields.datetime.now().hour + 1) + float(fields.datetime.now().minute)/60, required=True)
     equipment_id = fields.Many2one(
         'dgt_os.equipment','Equipamento',
         compute='_compute_relatorio_default',
@@ -774,10 +829,16 @@ class RelatoriosServico(models.Model):
             self.update({ 'time_execution' : tempo})		
             
     @api.one
-    @api.depends('os_id','os_id.cliente_id','os_id.equipment_id')
+    @api.depends('os_id','os_id.cliente_id','os_id.equipment_id','os_id.tecnicos_id','os_id.description')
     def _compute_relatorio_default(self):
         self.cliente_id = self.os_id.cliente_id.id
         self.equipment_id = self.os_id.equipment_id.id
+        self.tecnicos_id = self.os_id.tecnicos_id
+        self.motivo_chamado = self.os_id.description
+        if self.os_id.state == 'under_budget':
+            self.servico_executados = 'Realizado Orçamento'
+      
+            
         
 
 class RelatoriosAtendimentoLines(models.Model):
