@@ -82,7 +82,7 @@ class DgtOs(models.Model):
         journal = self._default_journal()
         return journal.currency_id or journal.company_id.currency_id
         
-    
+    sequence = fields.Integer(string='Sequence', default=10)
     name = fields.Char(string='OS. N', required=True, copy=False, readonly=True, index=True, default=lambda self: _('New'))
     
     origin = fields.Char('Source Document', size=64, readonly=True, states={'draft': [('readonly', False)]},
@@ -285,7 +285,7 @@ class DgtOs(models.Model):
     def onchange_digital_signature_client(self):
         self.signature_client_date = time.strftime('%Y-%m-%d %H:%M:%S')
         self.set_sign_client()
-        
+
 
     @api.onchange('date_execution')
     def onchange_execution_date(self):
