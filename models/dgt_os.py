@@ -670,12 +670,16 @@ class DgtOs(models.Model):
         if not self.relatorios:	
             raise UserError(_("Para finalizar O.S. deve-se incluir pelo menos um relatório de serviço."))
             return False
-        
-        if self.check_list_created:
-            for check in self.check_list:	
-                if not check.check:
-                    raise UserError(_("Para finalizar O.S. todas as instruções do check-list devem estar concluídas"))
-                    return False
+        #verificando se pecas foram aplicadas    
+        for p in self.pecas:
+            if not p.aplicada:
+               raise UserError(_("Para finalizar O.S. todas as peças devem ser aplicadas"))
+               return False 
+        #if self.check_list_created:
+        for check in self.check_list:	
+            if not check.check:
+                raise UserError(_("Para finalizar O.S. todas as instruções do check-list devem estar concluídas"))
+                return False
                     
         
         vals = {

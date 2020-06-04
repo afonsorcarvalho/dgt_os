@@ -172,7 +172,7 @@
                                         </notebook>
                                     </form>
                                     <tree string="Pecas" editable="bottom" >
-                                        <field name="sequence" widget="handle"/>
+                                        <!-- <field name="sequence" widget="handle"/> -->
                                         <field name="aplicada"/>
                                         <field name="product_id"/>
                                         <field name='name'/>
@@ -201,7 +201,7 @@
                                         </notebook>
                                     </form>
                                     <tree string="Serviços" editable="bottom" >
-                                        <field name="sequence" widget="handle"/>
+                                      <!--  <field name="sequence" widget="handle"/> -->
                                         <field name="product_id"/>
                                         <field name='name'/>
                                         <field name="product_uom_qty" string="Quantity"/>
