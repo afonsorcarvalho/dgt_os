@@ -11,6 +11,7 @@ class Category(models.Model):
     note = fields.Text()
     equipments_id = fields.One2many('dgt_os.equipment', 'category_id', string='Equipamentos')
     instructions_id = fields.One2many('dgt_os.equipment.category.instruction', 'category_id',copy=True)
+    sequence = fields.Integer(string='Sequence', default=10)
 
 
 class CategoryInstruction(models.Model):
