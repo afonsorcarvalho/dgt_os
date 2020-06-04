@@ -28,7 +28,7 @@
 							</group>
                             <field name="instructions_id" >
                                 <tree string="Instruções"  editable="bottom">
-                                    <field name="sequence" widget="handle" />
+                                  
                                     <field name="name" />
                                 </tree>
                 
