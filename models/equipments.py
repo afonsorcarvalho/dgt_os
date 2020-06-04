@@ -19,7 +19,7 @@ class CategoryInstruction(models.Model):
 
     name = fields.Char('Instrução')
     category_id = fields.Many2one('dgt_os.equipment.category')
-    sequence = fields.Integer()
+    sequence = fields.Integer(string='Sequence', default=10)
 
 
 class MaintenanceTeam(models.Model):
