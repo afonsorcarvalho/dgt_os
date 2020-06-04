@@ -7,3 +7,4 @@ class OsVerifyLis(models.Model):
     instruction = fields.Char('Instruções')
     check = fields.Boolean()
     observations = fields.Char()
+    sequence = fields.Integer(string='Sequence', default=10)
