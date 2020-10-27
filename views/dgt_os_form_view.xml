@@ -119,10 +119,11 @@
                                                     <group>
                                                         <field name="hora_inicio" string="Hora de inicio" widget="float_time" />
                                                         <field name="hora_termino" string="Hora de termino" widget="float_time" />
+                                                        <field name="tecnicos_id" widget="many2many_tags" required='1' />
                                                     </group>
                                                 </group>
                                                 <group>
-                                                    <field name="tecnicos_id" widget="many2many_tags" required='1' />
+                                                    
                                                     <field name="motivo_chamado" string="Motivo do Chamado" required='1'/>
                                                     <field name="tem_defeitos" string="Tem defeitos?" />
                                                     <field name="defeitos" string="Defeitos" attrs="{'invisible': [('tem_defeitos', '=', False)], 'required':[('tem_defeitos','=',True)]}"/>
