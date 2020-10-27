@@ -124,7 +124,6 @@
                                                     </group>
                                                 </group>
                                                 <group>
-                                                    
                                                     <field name="motivo_chamado" string="Motivo do Chamado" required='1'/>
                                                     <field name="tem_defeitos" string="Tem defeitos?" />
                                                     <field name="defeitos" string="Defeitos" attrs="{'invisible': [('tem_defeitos', '=', False)], 'required':[('tem_defeitos','=',True)]}"/>
