@@ -54,6 +54,7 @@
 
 
                                 <field name="analytic_account_id"  />
+				<field name="fiscal_position_id" groups="base.group_no_one"/>
 
                             </group>
                             <group>

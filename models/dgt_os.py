@@ -276,6 +276,7 @@ class DgtOs(models.Model):
     def onchange_client_id(self):
         if self.cliente_id:
             self.equipment_id = ()
+        self.fiscal_position_id = self.cliente_id.property_account_position_id.id
 
     @api.onchange('date_scheduled')
     def onchange_scheduled_date(self):
