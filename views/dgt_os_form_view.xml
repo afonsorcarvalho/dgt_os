@@ -108,14 +108,18 @@
                                     </header>
                                         <notebook>
                                             <page string="Relatórios Linha">
-                                                <group col="4">
-                                                    <field name="name" string="Relatório"/>
-                                                    <field name="relatorio_num" string="Relatório Nº."/>
-                                                    <field name="data_atendimento" string="Data de atendimento" />
-                                                    <field name="equipment_id" string="Equipamento"/>
-                                                    <field name="type_report" string="Tipo de Relatório" required="1" />
-                                                    <field name="hora_inicio" string="Hora de inicio" widget="float_time" />
-                                                    <field name="hora_termino" string="Hora de termino" widget="float_time" />
+                                                <group>
+                                                    <group>
+                                                        <field name="name" string="Relatório"/>
+                                                        <field name="relatorio_num" string="Relatório Nº."/>
+                                                        <field name="data_atendimento" string="Data de atendimento" />
+                                                        <field name="equipment_id" string="Equipamento"/>
+                                                        <field name="type_report" string="Tipo de Relatório" required="1" />
+                                                    </group>
+                                                    <group>
+                                                        <field name="hora_inicio" string="Hora de inicio" widget="float_time" />
+                                                        <field name="hora_termino" string="Hora de termino" widget="float_time" />
+                                                    </group>
                                                 </group>
                                                 <group>
                                                     <field name="tecnicos_id" widget="many2many_tags" required='1' />

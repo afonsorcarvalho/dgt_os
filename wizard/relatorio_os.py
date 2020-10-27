@@ -9,7 +9,7 @@ from datetime import datetime
 class OSReportWizard(models.TransientModel):
     _name = "dgt_os.os.report.wizard"
     _description = "Wizard to generate a custom report for the model dgt_os.os"
-    filter_model = fields.Reference(selection=[('res.partner', 'Cliente'), ('maintenance.equipment', 'Equipamento'), ('hr.employee', 'Técnico')])
+    filter_model = fields.Reference(selection=[('res.partner', 'Cliente'), ('dgt_os.equipment', 'Equipamento'), ('hr.employee', 'Técnico')])
     date_from = fields.Date()
     date_to = fields.Date()
     report = fields.Binary('Relatório', filters='.xls', readonly=True)
@@ -56,15 +56,15 @@ class OSReportWizard(models.TransientModel):
 
     def buscar_oses(self, filtro):
         if type(filtro) == type(self.env['res.partner']):
-            oses = self.env['dgt_os.os'].search([('cliente_id.name','=',self.filter_model.name), ('relatorios.atendimentos.data_ini', '>=', self.date_from), ('relatorios.atendimentos.data_ini', '<=', self.date_to)])
+            oses = self.env['dgt_os.os'].search([('cliente_id.name','=',self.filter_model.name), ('relatorios.data_atendimento', '>=', self.date_from), ('relatorios.data_atendimento', '<=', self.date_to)])
             return oses
 
-        elif type(filtro) == type(self.env['maintenance.equipment']):
-            oses = self.env['dgt_os.os'].search([('equipment_id.name','=',self.filter_model.name), ('relatorios.atendimentos.data_ini', '>=', self.date_from), ('relatorios.atendimentos.data_ini', '<=', self.date_to)])
+        elif type(filtro) == type(self.env['dgt_os.equipment']):
+            oses = self.env['dgt_os.os'].search([('equipment_id.name','=',self.filter_model.name), ('relatorios.data_atendimento', '>=', self.date_from), ('relatorios.data_atendimento', '<=', self.date_to)])
             return oses
 
         elif type(filtro) == type(self.env['hr.employee']):
-            oses = self.env['dgt_os.os'].search([('tecnicos_id.name','=',self.filter_model.name), ('relatorios.atendimentos.data_ini', '>=', self.date_from), ('relatorios.atendimentos.data_ini', '<=', self.date_to)])
+            oses = self.env['dgt_os.os'].search([('tecnicos_id.name','=',self.filter_model.name), ('relatorios.data_atendimento', '>=', self.date_from), ('relatorios.data_atendimento', '<=', self.date_to)])
             return oses
         
 
