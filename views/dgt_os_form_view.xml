@@ -120,7 +120,9 @@
                                                     <group>
                                                         <field name="hora_inicio" string="Hora de inicio" widget="float_time" />
                                                         <field name="hora_termino" string="Hora de termino" widget="float_time" />
-                                                        <field name="tecnicos_id" widget="many2many_tags" required='1' />
+                                                    </group>
+                                                    <group> 
+                                                       <field name="tecnicos_id" widget="many2many_tags" required='1' />
                                                     </group>
                                                 </group>
                                                 <group>
