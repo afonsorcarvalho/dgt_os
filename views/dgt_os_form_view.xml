@@ -126,6 +126,7 @@
                                                     </group>
                                                 </group>
                                                 <group>
+                                                  
                                                     <group>
 
                                                         <field name="motivo_chamado" string="Motivo do Chamado" required='1'/>
@@ -135,6 +136,16 @@
                                                         <field name="tem_pendencias" string="Tem pendências?" />
                                                         <field name="pendencias" string="Pendências" attrs="{'invisible': [('tem_pendencias', '=', False)], 'required':[('tem_pendencias','=',True)]}"/>
                                                         <field name="time_execution" string="Tempo de execução" readonly="True" widget="float_time" />
+                                                        
+                                                    </group>
+                                                    <group>
+                                                        <field name="name_digital_signature_client"  attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}"/>
+                                                        <field name="type_document_signature_client" />
+                                                        <field name="document_digital_signature_client"/>
+
+                                                        <field name="signature_client_date" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}" />
+                                                        <field name="is_sign_client"/>
+                                                        <field name="digital_signature_client" widget="signature"  attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}"/>
                                                     </group>
                                                    
                                                 </group>

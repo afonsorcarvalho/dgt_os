@@ -894,7 +894,10 @@ class RelatoriosServico(models.Model):
         string=u'Documento do Cliente Assinatura',
     )
 
-    type_document_signature_client = fields.Selection([('RG', 'CPF','Mátricula','Outros')])
+    type_document_signature_client = fields.Selection(string=u"Tipo de Documento",selection=[('rg', 'RG'),('cpf','CPF'),('matricula','Matrícula'),('Outros','Outros')])
+
+
+
 
     digital_signature_client = fields.Binary(string='Assinatura Cliente')
    
