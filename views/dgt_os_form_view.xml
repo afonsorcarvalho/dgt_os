@@ -126,13 +126,17 @@
                                                     </group>
                                                 </group>
                                                 <group>
-                                                    <field name="motivo_chamado" string="Motivo do Chamado" required='1'/>
-                                                    <field name="tem_defeitos" string="Tem defeitos?" />
-                                                    <field name="defeitos" string="Defeitos" attrs="{'invisible': [('tem_defeitos', '=', False)], 'required':[('tem_defeitos','=',True)]}"/>
-                                                    <field name="servico_executados" string="Serviços Executados" required='1'/>
-                                                    <field name="tem_pendencias" string="Tem pendências?" />
-                                                    <field name="pendencias" string="Pendências" attrs="{'invisible': [('tem_pendencias', '=', False)], 'required':[('tem_pendencias','=',True)]}"/>
-                                                    <field name="time_execution" string="Tempo de execução" readonly="True" widget="float_time" />
+                                                    <group>
+
+                                                        <field name="motivo_chamado" string="Motivo do Chamado" required='1'/>
+                                                        <field name="tem_defeitos" string="Tem defeitos?" />
+                                                        <field name="defeitos" string="Defeitos" attrs="{'invisible': [('tem_defeitos', '=', False)], 'required':[('tem_defeitos','=',True)]}"/>
+                                                        <field name="servico_executados" string="Serviços Executados" required='1'/>
+                                                        <field name="tem_pendencias" string="Tem pendências?" />
+                                                        <field name="pendencias" string="Pendências" attrs="{'invisible': [('tem_pendencias', '=', False)], 'required':[('tem_pendencias','=',True)]}"/>
+                                                        <field name="time_execution" string="Tempo de execução" readonly="True" widget="float_time" />
+                                                    </group>
+                                                   
                                                 </group>
                                             </page>
                                         </notebook>
