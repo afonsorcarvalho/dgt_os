@@ -1,128 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-			<act_window 
-				id="action_window_dgt_equipment"
-				name="Equipamentos"
-				res_model="dgt_os.equipment"
-				view_mode="tree,kanban,form"
-				target="current"
-				limit="40"
-			/>
+	<data>
+		<act_window id="action_window_dgt_equipment" name="Equipamentos" res_model="dgt_os.equipment" view_mode="tree,kanban,form" target="current" limit="40" />
 		<record id="view_dgt_equipment_filter" model="ir.ui.view">
-            <field name="name">dgt_os.equipment.list.select</field>
-            <field name="model">dgt_os.equipment</field>
-            <field name="priority" eval="15"/>
-            <field name="arch" type="xml">
-                <search string="Procura Equipamentos">
-                    <field name="name" string="Equipamento" filter_domain="['|',('name','ilike',self),('serial_number','ilike',self)]" />
-					<field name="serial_number" filter_domain="[('serial_number','ilike',self)]"/>
+			<field name="name">dgt_os.equipment.list.select</field>
+			<field name="model">dgt_os.equipment</field>
+			<field name="priority" eval="15" />
+			<field name="arch" type="xml">
+				<search string="Procura Equipamentos">
+					<field name="name" string="Equipamento" filter_domain="['|',('name','ilike',self),('serial_number','ilike',self)]" />
+					<field name="serial_number" filter_domain="[('serial_number','ilike',self)]" />
 					<field name="client_id" />
-					<field name="tag"/>
-					<field name="patrimony"/>
-					<field name="partner_id"/>
-					
-                   
-                    <group expand="0" string="Group By">
-                        
-						<filter name="Modelo" string="Modelo" domain="[]" context="{'group_by':'model'}"/>
-                        <filter name="Cliente" string="Cliente" domain="[]" context="{'group_by':'client_id'}"/>
-						<filter name="Fornecedor" string="Fornecedor" domain="[]" context="{'group_by':'partner_id'}"/>
-                    
-                    </group>
-               </search>
-            </field>
-        </record>
-			<!-- View do Formulário de Cadastro dos Equipamentos -->
-			<record id="view_form_dgt_os_equipment" model="ir.ui.view">
-				<field name="name">dgt_os.equipment.form</field>
-				<field name="model">dgt_os.equipment</field>
-				<field name="priority">15</field>
-				<field name="arch" type="xml">
-					<form>
-						 <header>
-							
-							<field name="situation_id" widget="statusbar"/>
-						</header>
-						<sheet string="Equipamento"> 
-							<h1>
-								<field name="name"/>
-								<t t-if="serial_number">
-									NS: <field name="serial_number" />
-								</t>
-								<t t-if="tag">
-									TAG: <field name="tag" />
-								</t>
-								<t t-if="patrimony">
-									Patrimônio: <field name="patrimony" />
-								</t>
-							</h1>
+					<field name="tag" />
+					<field name="patrimony" />
+					<field name="partner_id" />
+					<group expand="0" string="Group By">
+						<filter name="Modelo" string="Modelo" domain="[]" context="{'group_by':'model'}" />
+						<filter name="Cliente" string="Cliente" domain="[]" context="{'group_by':'client_id'}" />
+						<filter name="Fornecedor" string="Fornecedor" domain="[]" context="{'group_by':'partner_id'}" />
+					</group>
+				</search>
+			</field>
+		</record>
+		<!-- View do Formulário de Cadastro dos Equipamentos -->
+		<record id="view_form_dgt_os_equipment" model="ir.ui.view">
+			<field name="name">dgt_os.equipment.form</field>
+			<field name="model">dgt_os.equipment</field>
+			<field name="priority">
+				15
+			</field>
+			<field name="arch" type="xml">
+				<form>
+					<header>
+						<field name="situation_id" widget="statusbar" />
+					</header>
+					<sheet string="Equipamento">
+						<h1>
+							<field name="name" />
+							<t t-if="serial_number">
+								NS:
+								<field name="serial_number" />
+							</t>
+							<t t-if="tag">
+								TAG:
+								<field name="tag" />
+							</t>
+							<t t-if="patrimony">
+								Patrimônio:
+								<field name="patrimony" />
+							</t>
+						</h1>
+						<group>
 							<group>
-								<group>
-									<field name="category_id" />
-									<field name="client_id" />
-									<field name="situation_id" />
-									<field name="means_of_aquisition_id" />
-								</group>
-								<group>
-									<field name="maintenance_team_id" />
-									<field name="technician_id" />
-									<field name="location_id" />	
-								</group> 
+								<field name="category_id" />
+								<field name="client_id" />
+								<field name="situation_id" />
+								<field name="means_of_aquisition_id" />
 							</group>
-
-							<notebook>
-
-								<page string="Informação do Produto">
+							<group>
+								<field name="maintenance_team_id" />
+								<field name="technician_id" />
+								<field name="location_id" />
+							</group>
+						</group>
+						<notebook>
+							<page string="Informação do Produto">
+								<group>
 									<group>
-										<group>
-											<field name="partner_id" />
-											<field name="partner_reference" />
-											<field name="model" />
-											<field name="serial_number" />
-											<field name="anvisa_code" />
-											<field name="tag" />
-											<field name="patrimony" />
-										</group>
-										<group>
-											<field name="manufacturing_date" />
-											<field name="instalation_date" />
-											<field name="warranty" />
-											<field name="extended_warranty" />
-											<field name="invoice_document" />
-										</group>
+										<field name="partner_id" />
+										<field name="partner_reference" />
+										<field name="model" />
+										<field name="serial_number" />
+										<field name="anvisa_code" />
+										<field name="tag" />
+										<field name="patrimony" />
 									</group>
-								</page>
-
-								<page string="Manutenção">
 									<group>
-										<field name="next_maintenance" />
-										<field name="period" />
-										<field name="duration" widget="float_time"/>
+										<field name="manufacturing_date" />
+										<field name="instalation_date" />
+										<field name="warranty" />
+										<field name="extended_warranty" />
+										<field name="invoice_document" />
 									</group>
-								</page>
-
-								<page string="Descrição">
-									<field name="note" />
-								</page>
-
-							</notebook>
-
-							<div class="oe_chatter">
-								<field name="message_follower_ids" widget="mail_followers"/>
-								<field name="message_ids" widget="mail_thread"/>
-            				</div>
-
-						</sheet>
-					</form>
-
-				</field>
-
-			</record>
-
-			<record id="view_list_dgt_os_equipment" model="ir.ui.view">
-			<field name="name">dgt_os.equipment.list</field> 
-			<field name="model">dgt_os.equipment</field> 
+								</group>
+							</page>
+							<page string="Manutenção">
+								<group>
+									<field name="next_maintenance" />
+									<field name="period" />
+									<field name="duration" widget="float_time" />
+								</group>
+							</page>
+							<page string="Descrição">
+								<field name="note" />
+							</page>
+					
+							<page string="Relatórios de Serviço">
+								<field name="relatorios">
+									<tree string="Relatórios" default_order='data_atendimento desc' decoration-success="state=='done'" decoration-danger="state=='draft'">
+										<field name="name" string="Relatório" />
+										<field name="os_id" string="O.S." />
+										<field name="data_atendimento" string="data"/>
+										<field name="tecnicos_id" widget="many2many_tags" />
+										<field name="relatorio_num" string="Relatório Nº." />
+										<field name="equipment_id" string="Equipamento" invisible="True" />
+										<field name="motivo_chamado" string="Motivo do Chamado" invisible="True" />
+										<field name="type_report" string="Tipo" />
+										<field name="defeitos" string="Defeitos" invisible="True" />
+										<field name="servico_executados" string="Serviços Executados" />
+										<field name="pendencias" string="Pendências" />
+										<field name="time_execution" string="Tempo de execução" widget="float_time" />
+										<field name="state" string="Status" readonly="1" />
+									</tree>
+								</field>
+							</page>
+						</notebook>
+						<div class="oe_chatter">
+							<field name="message_follower_ids" widget="mail_followers" />
+							<field name="message_ids" widget="mail_thread" />
+						</div>
+					</sheet>
+				</form>
+			</field>
+		</record>
+		<record id="view_list_dgt_os_equipment" model="ir.ui.view">
+			<field name="name">dgt_os.equipment.list</field>
+			<field name="model">dgt_os.equipment</field>
 			<field name="arch" type="xml">
 				<tree string="Equipamentos">
 					<field name="name" />
@@ -137,57 +140,56 @@
 				</tree>
 			</field>
 		</record>
+		<!--
+		<record id="view_kanban_dgt_os_equipment" model="ir.ui.view">
+		<field name="name">dgt_os.equipment.kanban</field>
+		<field name="model">dgt_os.equipment</field>
+		<field name="arch" type="xml">
+		<kanban>
+		<field name="name" />
+		<field name="client_id" />
+		<templates>
+		<t t-name="kanban-box">
+		<div class="oe_kanban_card oe_kanban_global_click">
+		<field name="name" /> -
+		<field name="serial_number" /><br />
+		<field name="model" />
+		<field name="client_id" />
+		</div>
 		
-<!--	<record id="view_kanban_dgt_os_equipment" model="ir.ui.view">
-			<field name="name">dgt_os.equipment.kanban</field> 
-			<field name="model">dgt_os.equipment</field> 
-			<field name="arch" type="xml">
-				<kanban>
-					<field name="name" />
-					<field name="client_id" />
-					<templates>
-						<t t-name="kanban-box">
-								<div class="oe_kanban_card oe_kanban_global_click">
-										<field name="name" /> - 
-										<field name="serial_number" /><br />
-										<field name="model" /> 
-										<field name="client_id" />
-								</div>
-							
-						</t>
-					</templates>
-
-				</kanban>
-				<tree>
-					<field name="name" />
-					<field name="client_id" />
-					<field name="patrimony" />
-					<field name="tag" />
-					<field name="model" />
-					<field name="partner_id" />
-					<field name="situation_id" />
-					<field name="location_id" />
-				</tree>
-			</field>
+		</t>
+		</templates>
+		
+		</kanban>
+		<tree>
+		<field name="name" />
+		<field name="client_id" />
+		<field name="patrimony" />
+		<field name="tag" />
+		<field name="model" />
+		<field name="partner_id" />
+		<field name="situation_id" />
+		<field name="location_id" />
+		</tree>
+		</field>
 		</record>
 		<record model="ir.ui.view" id="dgt_os_equipment_search_view">
-            <field name="name">dgt_os.equipment.search</field>
-            <field name="model">dgt_os.equipment</field>
-            <field name="arch" type="xml">
-                <search>
-                    <field name="name" />
-					<field name="serial_number" />
-					<field name="client_id" />
-					<field name="patrimony" />
-					<field name="tag" />
-					<field name="model" />
-					<field name="partner_id" />
-					<field name="situation_id" />
-					<field name="location_id" />
-                </search>
-            </field>
-        </record>
-			-->	
-
-    </data>
+		<field name="name">dgt_os.equipment.search</field>
+		<field name="model">dgt_os.equipment</field>
+		<field name="arch" type="xml">
+		<search>
+		<field name="name" />
+		<field name="serial_number" />
+		<field name="client_id" />
+		<field name="patrimony" />
+		<field name="tag" />
+		<field name="model" />
+		<field name="partner_id" />
+		<field name="situation_id" />
+		<field name="location_id" />
+		</search>
+		</field>
+		</record>
+		-->
+	</data>
 </odoo>
