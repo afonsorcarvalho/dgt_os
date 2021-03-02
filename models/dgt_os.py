@@ -1,6 +1,6 @@
 ﻿import time
 from datetime import date, datetime, timedelta
-from odoo import models, fields, api, _, SUPERUSER_ID
+from odoo import models, fields,  api, _, SUPERUSER_ID
 from odoo.addons import decimal_precision as dp
 from odoo import netsvc
 from odoo.exceptions import UserError
@@ -526,6 +526,12 @@ class DgtOs(models.Model):
         for item in self:
             if item.state != 'done':
                 item.write({'state': 'execution_ready'})
+                post_vars = {'subject': "Ordem Aprovada",
+                            'body': "A cotação foi aprovada pelo cliente, favor agendar execução",
+                           } # Where "4" adds the ID to the list 
+                                       # of followers and "3" is the partner ID 
+                
+                item.message_post(body="A cotação foi aprovada pelo cliente, favor agendar execução",subject="Ordem Aprovada",partner_ids=[3])
         _logger.debug("os state=%s ", self.state)
 
     # TODO Colocar também o técnico que irá receber a comissão
@@ -837,8 +843,13 @@ class RelatoriosServico(models.Model):
     state = fields.Selection(string='Status', selection=[(
         'draft', 'rascunho'), ('done', 'Concluído')], default='draft')
     type_report = fields.Selection(string='Tipo de Relatório', selection=[(
-        'quotation', 'Orçamento'), ('repair', 'Manutenção'), ('calibrate', 'Calibração')], default="repair")
-
+        'quotation', 'Orçamento'), ('repair', 'Manutenção'),('instalation', 'Instalação'), ('calibrate', 'Calibração')], default="repair")
+    parts_request = fields.One2many(
+        'dgt_os.os.pecas.line', 'relatorio_aplication_id', 'Pecas Requisitadas',
+        copy=True)
+    parts_application = fields.One2many(
+        'dgt_os.os.pecas.line', 'relatorio_request_id', 'Pecas Aplicadas',
+        copy=True)
     os_id = fields.Many2one(
         'dgt_os.os', 'Ordem de serviço',
         index=True, ondelete='cascade')
@@ -902,9 +913,14 @@ class RelatoriosServico(models.Model):
     digital_signature_client = fields.Binary(string='Assinatura Cliente')
    
     def set_is_sign_client(self):
-        self. is_sign_client  = 1
+        self.is_sign_client  = 1
 
-
+    
+    
+    
+    
+    
+    
     # @api.multi
     # def get_data_hora_inicio(self):
     #   self.search([('', '=', ), ...], offset=0, limit=None, order=None, count=False)

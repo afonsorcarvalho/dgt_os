@@ -18,5 +18,6 @@ class DgtSaleOrder(models.Model):
         if self.os_id.id:
             _logger.debug("Ordem de serviço %s sendo aprovada", self.os_id.name)
             self.os_id.approve()
+            
         return res
     

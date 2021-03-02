@@ -120,6 +120,79 @@
 														<field name="pendencias" string="Pendências" attrs="{'invisible': [('tem_pendencias', '=', False)], 'required':[('tem_pendencias','=',True)]}" />
 														<field name="time_execution" string="Tempo de execução" readonly="True" widget="float_time" />
 													</group>
+												</group>
+												<group>
+													<group>
+														
+															<field name="parts_request" nolabel="1" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}">
+																<form string="Peças">
+																	<notebook>
+																		<page string="Pecas linhas">
+																			<group>
+																				<field name="aplicada" string="Status" />
+																				<field name="os_id" />
+																				<field name="product_id" />
+																				<field name="name" />
+																			</group>
+																			<group>
+																				<field name="qty_available" string="Qtd Disp." />
+																				<field name="product_uom_qty" string="Qtd" />
+																				<field name="product_uom" string="Unidade" />
+																			</group>
+																		</page>
+																	</notebook>
+																</form>
+																<tree string="Pecas Solicitadas" editable="bottom">
+																	<!-- <field name="sequence" widget="handle"/> -->
+																	<field name="aplicada" />
+																	<field name="product_id" />
+																	<field name="os_id" />
+
+																	<field name="name" />
+																	<field name="lot_id" domain="[('product_id', '=', product_id)]" context="{'default_product_id': product_id}" groups="stock.group_production_lot" />
+																	<field name="qty_available" string="Qtd Disp." />
+																	<field name="product_uom_qty" string="Quantity" />
+																	<field name="product_uom" string="Unit of Measure" groups="product.group_uom" />
+																</tree>
+															</field>
+															<div class="oe_clear" />
+															
+													</group>
+													<group >
+													<h1>Peças Requisitadas</h1>
+															<field name="parts_application" string="Peças Requisitadas" nolabel="1" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}">
+																<form string="Peças">
+																	<notebook>
+																		<page string="Pecas linhas">
+																			<group>
+																				<field name="aplicada" string="Status" />
+																				<field name="product_id" />
+																				<field name="name" />
+																				<field name="os_id" />
+																			</group>
+																			<group>
+																				<field name="qty_available" string="Qtd Disp." />
+																				<field name="product_uom_qty" string="Qtd" />
+																				<field name="product_uom" string="Unidade" />
+																			</group>
+																		</page>
+																	</notebook>
+																</form>
+																<tree string="Pecas" editable="bottom">
+																	<!-- <field name="sequence" widget="handle"/> -->
+																	<field name="aplicada" />
+																	<field name="product_id" />
+																	<field name="name" />
+																	<field name="os_id" />
+																	<field name="lot_id" domain="[('product_id', '=', product_id)]" context="{'default_product_id': product_id}" groups="stock.group_production_lot" />
+																	<field name="qty_available" string="Qtd Disp." />
+																	<field name="product_uom_qty" string="Quantity" />
+																	<field name="product_uom" string="Unit of Measure" groups="product.group_uom" />
+																</tree>
+															</field>
+															<div class="oe_clear" />
+													
+													</group>
 													<group>
 														<field name="name_digital_signature_client" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}" />
 														<field name="type_document_signature_client" />
