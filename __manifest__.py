@@ -48,6 +48,7 @@
 		'views/dgt_os_pecas_line_view.xml',
 		'views/dgt_os_view.xml',
 		'views/dgt_os_request_view.xml',
+        'views/dgt_os_os_relatorio_servico_view.xml',
         'views/dgt_os_form_view.xml',
         'views/equipment_view.xml',
         'views/equipment_category_view.xml',

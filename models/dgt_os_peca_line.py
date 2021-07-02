@@ -2,6 +2,9 @@ from odoo import models, fields, api, _
 from odoo.addons import decimal_precision as dp
 from datetime import datetime
 
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class DgtOsPecasLine(models.Model):
 	_name = 'dgt_os.os.pecas.line'
@@ -55,30 +58,11 @@ class DgtOsPecasLine(models.Model):
 	@api.one
 	@api.depends('product_uom_qty', 'product_id')
 	def _compute_peca_disponivel(self):
-		self.qty_available  = self.product_id.qty_available
-  
+		self.qty_available = self.product_id.qty_available
 		
-	#@api.onchange('type', 'os_id')
-	def onchange_operation_type(self):
-		""" On change of operation type it sets source location, destination location
-		and to invoice field.
-		@param product: Changed operation type.
-		@param guarantee_limit: Guarantee limit of current record.
-		@return: Dictionary of values.
-		"""
-		if not self.type:
-			self.location_id = False
-			self.Location_dest_id = False
-		elif self.type == 'add':
-			args = self.os_id.company_id and [('company_id', '=', self.os_id.company_id.id)] or []
-			warehouse = self.env['stock.warehouse'].search(args, limit=1)
-			self.location_id = warehouse.lot_stock_id
-			self.location_dest_id = self.env['stock.location'].search([('usage', '=', 'production')], limit=1).id
-			self.to_invoice = self.os_id.guarantee_limit and datetime.strptime(self.os_id.guarantee_limit, '%Y-%m-%d') < datetime.now()
-		else:
-			self.location_id = self.env['stock.location'].search([('usage', '=', 'production')], limit=1).id
-			self.location_dest_id = self.env['stock.location'].search([('scrap_location', '=', True)], limit=1).id
-			self.to_invoice = False
+	def action_aplicar_pecas(self):
+		_logger.info("aplicando peças:")
+  
 	
 	@api.onchange('os_id', 'product_id', 'product_uom_qty')
 	def onchange_product_id(self):

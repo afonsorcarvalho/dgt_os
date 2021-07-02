@@ -85,6 +85,7 @@ class DgtOsRequest(models.Model):
 					'tecnicos_id': [(4, self.tecnicos.id)]
 					}
 			self.env['dgt_os.os'].create(vals)
+			
 		self.write({'stage_id': 'in_progress'})
 		return True
 

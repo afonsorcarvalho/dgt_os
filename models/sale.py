@@ -6,7 +6,8 @@ _logger = logging.getLogger(__name__)
 class DgtSaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    os_id = fields.Many2one('dgt_os.os', string='Ordem de serviço',copy=False)
+    os_id = fields.Many2one('dgt_os.os', string='Ordem de serviço', copy=False)
+    equipment_id = fields.Many2one('dgt_os.equipment', related='os_id.equipment_id', readonly=True, store=True)
     
     @api.multi
     def action_confirm(self):

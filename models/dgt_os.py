@@ -534,24 +534,30 @@ class DgtOs(models.Model):
                 item.message_post(body="A cotação foi aprovada pelo cliente, favor agendar execução",subject="Ordem Aprovada",partner_ids=[3])
         _logger.debug("os state=%s ", self.state)
 
-    # TODO Colocar também o técnico que irá receber a comissão
-    # colocar tempo de execução no serviço do contrato, mas isso tem que ser feito ao realizar fim da execução ou qd
-    # aciona o botão de gerar o orçamento
+    # TODO
+    #  - Colocar também o técnico que irá receber a comissão
+    #  - colocar tempo de execução no serviço do contrato, mas isso tem que ser feito ao realizar fim da execução ou qd
+    #   aciona o botão de gerar o orçamento
+    #  - fazer atualização do orçamento ao mudar alguma coisa de peças e serviços na Ordem de serviço
+    #
     def gera_orcamento(self):
         if self.filtered(lambda dgt_os: dgt_os.gerado_cotacao == True):
             raise UserError(
                 _("Cotação para esse Ordem de serviço já foi gerada"))
+
         if not len(self.servicos):
             raise UserError(
                 _("Para gerar cotação deve ter pelo menos um serviço adicionado"))
+
         if self.state == 'under_budget':
             _logger.debug("Ordem de serviço em orçamento")
             _logger.debug("Procura serviço para atualizar tempo")
 
-        _logger.debug("posicão fiscal: %s", self.fiscal_position_id.name)
+        _logger.debug("Posicão Fiscal: %s", self.fiscal_position_id.name)
         _logger.debug("Conta Analítica: %s", self.analytic_account_id.name)
         _logger.debug("Gerando cotação para %s:", self.name)
 
+        # criando cotação
         saleorder = self.env['sale.order'].create({
             "origin": self.name,
             "partner_id": self.cliente_id.id,
@@ -560,27 +566,58 @@ class DgtOs(models.Model):
             "fiscal_position_id": self.fiscal_position_id.id,
 
         })
+        
         _logger.info("Sale_order gerada: %s", saleorder.name)
         _logger.debug(saleorder)
 
-        if saleorder.id:
+        # erro na geração da cotação
+        if not saleorder.id:
+            raise UserError(
+                _("Algum erro inesperado na geração da cotação. Cotação não gerada!!"))
+        
+        # cotação gerada com sucesso
+        else:
+           
             _logger.debug("criar linhas da sale.order:")
             _logger.debug(saleorder.name)
 
-            name_note = "Referente ao equipamento "
-            if self.equipment_id.name:
-                name_note = name_note + self.equipment_id.name
-            #if self.equipment_id.category_id.name: name_note = name_note + self.equipment_id.category_id.name
-            if self.equipment_serial_number:
-                name_note = name_note + " NS " + \
-                    str(self.equipment_serial_number)
-            if self.equipment_model:
-                name_note = name_note + " Modelo: " + str(self.equipment_model)
+            # adicionando notas
+            self.add_notes_orcamento(saleorder)
+         
+            # adicionando peças
+            self.add_pecas_orcamento(saleorder)  
 
-            # Adicionando as peças
-            _logger.debug(
+            # adicionando serviços
+            _logger.debug("Adicionando seção de serviços:")
+            self.add_servico_orcamento(saleorder)
+            
+            # sinalizando que cotação ja foi gerada
+            self.write({'sale_id': saleorder.id, 'gerado_cotacao': True})
+
+            # adicionando comissão ao agente
+            self.set_agente_commission()
+
+        return True
+
+    def add_notes_orcamento(self, saleorder):
+        
+        # Adicionandos notas
+        
+        name_note = "Referente ao equipamento "
+
+        if self.equipment_id.name:
+            name_note = name_note + self.equipment_id.name
+        #if self.equipment_id.category_id.name: name_note = name_note + self.equipment_id.category_id.name
+        if self.equipment_serial_number:
+            name_note = name_note + " NS " + \
+                str(self.equipment_serial_number)
+        if self.equipment_model:
+            name_note = name_note + " Modelo: " + str(self.equipment_model)
+
+        _logger.debug(
                 "Adicionando notas explicativas da cotação: %s", name_note)
-            self.env['sale.order.line'].create({
+
+        self.env['sale.order.line'].create({
                 'name': name_note,
                 'display_type': 'line_note',
                 'order_id': saleorder.id,
@@ -588,8 +625,18 @@ class DgtOs(models.Model):
                 'product_uom': False,
 
             })
+
+    def add_pecas_orcamento(self, saleorder):
+
+        # Adicionando as peças
+
+        # Verificando se tem pecas para adicionar
+        if len(self.pecas) == 0:
+            _logger.debug("Nenhuma peça para adicionar!!")
+        else:
             secao_str = "Peças da " + self.name + ":"
             _logger.debug("Adicionando seção peça da cotação: %s", secao_str)
+            
             self.env['sale.order.line'].create({
                 'name': secao_str,
                 'display_type': 'line_section',
@@ -611,11 +658,12 @@ class DgtOs(models.Model):
                     'invoice_lines': peca.invoice_line_id.id,
                 })
                 _logger.debug("Adicionado peça %s, qty %s",
-                              saleline.product_id.name, saleline.product_uom_qty)
+                                saleline.product_id.name, saleline.product_uom_qty)
+    
+    def add_servico_orcamento(self, saleorder):
+        # Adicionando Servicos
 
-            # adicionando serviços
-            _logger.debug("Adicionando seção de serviços:")
-            self.env['sale.order.line'].create({
+        self.env['sale.order.line'].create({
                 'name': "Serviços da " + self.name + ":",
                 'display_type': 'line_section',
                 'order_id': saleorder.id,
@@ -623,29 +671,28 @@ class DgtOs(models.Model):
                 'product_uom': False,
 
             })
-            _logger.debug("Sessão serviços criada!!!")
-            # TODO Pegar do contrato o serviço product_id caso tenha configurado no contrato
-            for servico in self.servicos:
-                _logger.info("adicionando linhas:")
-                saleline = self.env['sale.order.line'].create({
+        _logger.debug("Sessão serviços criada!!!")
 
-                    'order_id': saleorder.id,
-                    'product_id': servico.product_id.id,
-                    'product_uom_qty': servico.product_uom_qty,
-                    'product_uom': servico.product_uom.id,
-                    'invoice_lines': servico.invoice_line_id.id,
-                })
-                _logger.debug("Adicionado serviço %s, qty %s",
-                              saleline.product_id.name, saleline.product_uom_qty)
+        # TODO Pegar do contrato o serviço product_id caso tenha configurado no contrato
+        for servico in self.servicos:
+            _logger.info("adicionando linhas:")
+            saleline = self.env['sale.order.line'].create({
 
-            self.write({'sale_id': saleorder.id, 'gerado_cotacao': True})
-            self.set_agente_commission()
+                'order_id': saleorder.id,
+                'product_id': servico.product_id.id,
+                'product_uom_qty': servico.product_uom_qty,
+                'product_uom': servico.product_uom.id,
+                'invoice_lines': servico.invoice_line_id.id,
+            })
+            _logger.debug("Adicionado serviço %s, qty %s",
+                            saleline.product_id.name, saleline.product_uom_qty)
 
-        return True
+
     # apenas usado para teste de pegar o representante com suas comissões
     # TODO
     # apagar essa action após desenvolvimento
-
+    #
+    @api.multi
     def action_agente(self):
         self.set_agente_commission()
 
