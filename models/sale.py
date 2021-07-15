@@ -7,6 +7,8 @@ class DgtSaleOrder(models.Model):
     _inherit = 'sale.order'
 
     os_id = fields.Many2one('dgt_os.os', string='Ordem de serviço', copy=False)
+    os_status =fields.Selection(related='os_id.state',readonly=True,store=False) 
+    
     equipment_id = fields.Many2one('dgt_os.equipment', related='os_id.equipment_id', readonly=True, store=True)
     
     @api.multi

@@ -21,7 +21,9 @@ class Equipment(models.Model):
         'dgt_os.equipment.location', 'Local de Uso', required=True)
     partner_id = fields.Many2one('res.partner', 'Fornecedor')
     partner_reference = fields.Char('Referência de Fornecedor')
-    model = fields.Char('Modelo')
+    model = fields.Char('Modelo', 
+    required=True
+    )
     serial_number = fields.Char('Número de Série', copy=False)
     anvisa_code = fields.Char('Reg Anvisa')
     tag = fields.Char('Tag')
@@ -119,6 +121,11 @@ class Situation(models.Model):
     _name = 'dgt_os.equipment.situation'
 
     name = fields.Char('Situação')
+    _sql_constraints = [
+
+        ('situation_uniq', 'unique (name)', 'O nome já existe !')
+
+    ]
 
 
 class MeansOfAquisition(models.Model):
@@ -126,4 +133,5 @@ class MeansOfAquisition(models.Model):
 
     name = fields.Char('Meio de Aquisição')
 
+   
 

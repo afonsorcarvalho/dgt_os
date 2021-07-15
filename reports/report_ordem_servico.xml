@@ -1,260 +1,312 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-<data>
-<template id="dgt_os.report_ordem_servico">
-<t t-call="web.html_container">
-	<t t-foreach="docs" t-as="o">
-		<t t-call="web.external_layout">
-			<div class="page">
-			  
-				
-				<div class="row">
-					<div class="col-6">
-
-						<h2>Check List Preventiva: <span t-field="o.name"/></h2>
-					</div>
-				 <!-- <div  > -->
-					<!-- <img width="100px" height="100px" t-att-src="'/report/barcode/QR/%s' % 'My text in qr code'"/> -->
-					<!-- <img class="col-6 float-right" width="100" height="100" t-att-src="'/report/barcode/QR/%s%s' % ('http://server.diagnostica-ma.com.br:8069/report/pdf/dgt_os.report_ordem_servico/',o.id)"/> -->
-				<!--  </div> -->
-				</div>
-				<div class="row mt32 mb32">
-					<div class="col-9">
-						<strong>Cliente:</strong><br/>
-						<b><span t-field="o.cliente_id.name"/></b> - <span t-field="o.cliente_id.cnpj_cpf"/><br/>
-						<span t-field="o.cliente_id.street"/>, <span t-field="o.cliente_id.number"/>, 
-						<span t-field="o.cliente_id.district"/>
-						<span t-field="o.cliente_id.street2"/>-
-						<span t-field="o.cliente_id.city_id.name"/><br/> 
-						<span t-field="o.cliente_id.state_id.name"/>-
-						<span t-field="o.cliente_id.country_id.name"/>-
-						<span t-field="o.cliente_id.zip"/>
-					</div>
-					<div class="col-3">
-						<strong>Contato:</strong><br/>
-						<span t-field="o.cliente_id.phone"/><br/> 
-						<span t-field="o.cliente_id.mobile"/><br/>
-						<span t-field="o.cliente_id.email"/>
-					</div>
-				</div>
-				<div class="row mt32 mb32">
-					<div class="col-6">
-										<strong>Equipamento:</strong><br/>
-										<span t-field="o.equipment_id.name"/>
-						<span t-field="o.equipment_id.serial_number"/>
-						<span t-if="o.equipment_id.model" t-field="o.equipment_id.model"/>
-						<span t-if="o.equipment_id.partner_id.name" t-field="o.equipment_id.partner_id.name"/>
-					</div>
-					<div class="col-3">
-							<strong>Tipo de Manutenção:</strong><br/>
-							<span t-field="o.maintenance_type"/>
-					</div>
-					<div class="col-3" t-if="o.state">
-							<strong>Status:</strong><br/>
-							<span t-field="o.state"/>
-					</div>
-	      </div>
-	      <div class="row">
-	        	<div class="col-9">
-										<strong>Descrição da OS:</strong><br/>
-									  <span t-field="o.description"/>
-					  </div>
-	      </div>
-					<div class="row mt32 mb32">
-					   <t t-if="o.origin">
-		      <div class="col-6">
-		       
-						<strong>Solicitação Origem:</strong><br/>
-							<span t-field="o.origin"/>
-					
-					</div>
-						</t>
-					<!-- <div class="col-xs-3" t-if="o.state == 'draft'">
-						<strong>Data Planejada:</strong><br/>
-						<span t-field="o.date_planned"/>
-					</div>
-					<div class="col-xs-3" t-if="o.state != 'draft'">
-						<strong>Data Programada:</strong><br/>
-						<span t-field="o.date_scheduled"/>
-					</div>
-		<div class="col-xs-3" t-if="o.state != 'draft'">
-						<strong>Data Executada:</strong><br/>
-						<span t-field="o.date_execution"/>
-					</div> -->
-					
-		<div class="col-6">
-						<strong>Data de impressão:</strong><br/>
-						<span t-esc="time.strftime('%d-%m-%Y')"/>
-					</div>
-				</div>
-		<!-- <div class="row mt32 mb32"> -->
-				<h3 t-if="o.pecas">Peças</h3>
-		<!-- </div> -->
-		<div class="row mt32 mb32">
-				 <table class="table table-condensed" t-if="o.pecas">
-					<thead>
-						<tr>
-							<th><strong>Status</strong></th>
-							<th class="text-right"><strong>Quantidade</strong></th>
-							<th><strong>Descrição</strong></th>
-						</tr>
-					</thead>
-					<tbody>
-						<t t-if="o.pecas">
-							<!-- <tr>
-								<td colspan="4"><strong>Peças Programadas</strong></td>
-							</tr> -->
-							<tr t-foreach="o.pecas" t-as="line">
-								<td>
-									<span t-if="line.aplicada">Aplicada</span>
-									<span t-else="">Não Aplicada</span>
-									
-									
-								</td>
-								<td class="text-right">
-								   <span t-field="line.product_uom_qty"/>
-									<span t-field="line.product_uom" groups="product.group_uom"/>
-								</td>
-								<td>
-									<span t-field="line.name"/>
-								</td>
-							</tr>
-						</t>
-					</tbody>
-				</table>
-		</div>
-	
-		 <!-- <div class="row"> -->
-			 <h3 t-if="o.servicos">Serviços</h3>
-		<!--	 </div> -->
-			<div t-if="o.servicos" class="row mt32 mb32">
-				 <table class="table table-condensed" t-if="o.servicos">
-					<thead>
-						<tr>
-							<!-- <th><strong>Status</strong></th>
-							<th class="text-right"><strong>Quantidade</strong></th> -->
-							<th><strong>Descrição</strong></th>
-						</tr>
-					</thead>
-					<tbody>
-						<t t-if="o.servicos">
-							<!-- <tr>
-								<td colspan="4"><strong>Peças Programadas</strong></td>
-							</tr> -->
-							<tr t-foreach="o.servicos" t-as="line">
-							   <!-- <td>
-									<span t-field="line.type"/>
-									
-								</td>
-								<td class="text-right">
-								   <span t-field="line.product_uom_qty"/>
-									<span t-field="line.product_uom" groups="product.group_uom"/>
-								</td>-->
-								<td>
-									<span t-field="line.name"/>
-								</td>
-							</tr>
-						</t>
-					</tbody>
-				</table>
-		</div>
-		
-		 <h3 t-if="o.relatorios">Relatório(s) de Atendimento</h3>
-		 <div class="row mt32 mb32">
-		   <t t-if="o.relatorios">
-				 <t t-foreach="o.relatorios" t-as="line">
-				 <table class="table table-condensed" t-if="o.relatorios">
-					<thead>
-						<tr>
-							<th colspan="4"  style="width:10%"><span t-field="line.name"/></th>
-						</tr>
-						<tr>
-							<th style="width:80%" >Descrição dos serviços</th> 
-							<!-- <th><strong>Serviços executados</strong></th> -->
-							<!-- <th><strong>Pendências</strong></th> -->
-							<th>Dt. início</th>
-							<th>Dt. fim</th>
-						</tr>
-					</thead>
-					<tbody>
-						
-							  
-								<tr>
-								<td class="text-left">
-								   <strong>Defeitos: </strong><span t-field="line.defeitos"/><br/>
-								   <strong>Serviços executados: </strong><span t-field="line.servico_executados"/><br/>
-								   <t t-if="line.pendencias">
-									    <strong>Pendências: </strong><span t-field="line.pendencias"/>
-								   </t>
-								</td>
-								</tr>
-								<tr>
-								<t t-if="line.atendimentos">
-											<td class="text-left">
-												<t t-foreach="line.atendimentos" t-as="rline">
-													<span t-field="rline.data_ini"/>
-												</t>
-											</td>
-											<td class="text-left">
-												<t t-foreach="line.atendimentos" t-as="rline">
-													<span t-field="rline.data_fim"/>
-												</t>
-											</td>
+	<data>
+		<template id="dgt_os.report_ordem_servico">
+			<t t-call="web.html_container">
+				<t t-foreach="docs" t-as="o">
+					<t t-call="web.external_layout">
+						<div class="page">
+							<div class="row">
+								<div class="col-6">
+									<h2>
+										Check List Preventiva:
+										<span t-field="o.name" />
+									</h2>
+								</div>
+								<!-- <div  > -->
+								<!-- <img width="100px" height="100px" t-att-src="'/report/barcode/QR/%s' % 'My text in qr code'"/> -->
+								<!-- <img class="col-6 float-right" width="100" height="100" t-att-src="'/report/barcode/QR/%s%s' % ('http://server.diagnostica-ma.com.br:8069/report/pdf/dgt_os.report_ordem_servico/',o.id)"/> -->
+								<!-- </div> -->
+							</div>
+							<div class="row mt32 mb32">
+								<div class="col-9">
+									<strong>
+										Cliente:
+									</strong>
+									<br />
+									<b>
+										<span t-field="o.cliente_id.name" />
+									</b>
+									-
+									<span t-field="o.cliente_id.cnpj_cpf" />
+									<br />
+									<span t-field="o.cliente_id.street" />
+									,
+									<span t-field="o.cliente_id.number" />
+									,
+									<span t-field="o.cliente_id.district" />
+									<span t-field="o.cliente_id.street2" />
+									-
+									<span t-field="o.cliente_id.city_id.name" />
+									<br />
+									<span t-field="o.cliente_id.state_id.name" />
+									-
+									<span t-field="o.cliente_id.country_id.name" />
+									-
+									<span t-field="o.cliente_id.zip" />
+								</div>
+								<div class="col-3">
+									<strong>
+										Contato:
+									</strong>
+									<br />
+									<span t-field="o.cliente_id.phone" />
+									<br />
+									<span t-field="o.cliente_id.mobile" />
+									<br />
+									<span t-field="o.cliente_id.email" />
+								</div>
+							</div>
+							<div class="row mt32 mb32">
+								<div class="col-6">
+									<strong>
+										Equipamento:
+									</strong>
+									<br />
+									<span t-field="o.equipment_id.name" />
+									<span t-field="o.equipment_id.serial_number" />
+									<span t-if="o.equipment_id.model" t-field="o.equipment_id.model" />
+									<span t-if="o.equipment_id.partner_id.name" t-field="o.equipment_id.partner_id.name" />
+								</div>
+								<div class="col-3">
+									<strong>
+										Tipo de Manutenção:
+									</strong>
+									<br />
+									<span t-field="o.maintenance_type" />
+								</div>
+								<div class="col-3" t-if="o.state">
+									<strong>
+										Status:
+									</strong>
+									<br />
+									<span t-field="o.state" />
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-9">
+									<strong>
+										Descrição da OS:
+									</strong>
+									<br />
+									<span t-field="o.description" />
+								</div>
+							</div>
+							<div class="row mt32 mb32">
+								<t t-if="o.origin">
+									<div class="col-6">
+										<strong>
+											Solicitação Origem:
+										</strong>
+										<br />
+										<span t-field="o.origin" />
+									</div>
 								</t>
-								</tr>
-								</tbody>
-				        </table>
-							</t>
-						</t>
-				
-		</div>
-				<div class="row mt32 mb32">
-					<div class="col-6">
-							<strong>Técnico(s):</strong><br/>
-							<span t-if="o.relatorios">
-								<span t-foreach="o.tecnicos_id" t-as="line">
-									<span t-field="line.name"/><br/>
-								</span>
-							</span>
-					</div>
-					<div class="col-6">
-						Local e data: ________________,_______/______/________
-					</div>
-				</div>
-				<div class="row mt32 mb32">
-					<div class="col-6">
-
-					_____________________________<br/>
-						  Assinatura Técnico
-					</div>
-					<div class="col-6">
-					____________________________________<br/>
-					  Assinatura e Carimbo do Cliente
-					</div>
-				</div>
-				<!-- <div style="text-align:right;width:100%">
-				Local e data: ________________,_______/______/________
-				</div>
-				<div style="padding:10px;float:left;text-align:center;width:250px;height:100px">
-				<br/>
-					  <br/>
-					  _____________________________<br/>
-						  Assinatura Técnico
-					  
-				</div>
-				<div style="padding:10px;float:right;text-align:center;width:300px;height:100px">
-				<br/>
-					 <br/>
-					  ____________________________________<br/>
-					  Assinatura e Carimbo do Cliente
-					  
-				</div>-->
-				<div class="oe_structure"/>
-			</div>
-		</t>
-	</t>
-</t>
-
-</template>
-</data>
+								<div class="col-6">
+									<strong>
+										Data de impressão:
+									</strong>
+									<br />
+									<span t-esc="time.strftime('%d-%m-%Y')" />
+								</div>
+							</div>
+							<!-- <div class="row mt32 mb32"> -->
+							<h3 t-if="o.pecas">
+								Peças
+							</h3>
+							<!-- </div> -->
+							<div class="row mt32 mb32">
+								<table class="table table-condensed" t-if="o.pecas">
+									<thead>
+										<tr>
+											<th>
+												<strong>
+													Status
+												</strong>
+											</th>
+											<th class="text-right">
+												<strong>
+													Quantidade
+												</strong>
+											</th>
+											<th>
+												<strong>
+													Descrição
+												</strong>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<t t-if="o.pecas">
+											<!--
+											<tr>
+											<td colspan="4"><strong>Peças Programadas</strong></td>
+											</tr>
+											-->
+											<tr t-foreach="o.pecas" t-as="line">
+												<td>
+													<span t-if="line.aplicada">
+														Aplicada
+													</span>
+													<span t-else="">
+														Não Aplicada
+													</span>
+												</td>
+												<td class="text-right">
+													<span t-field="line.product_uom_qty" />
+													<span t-field="line.product_uom" groups="product.group_uom" />
+												</td>
+												<td>
+													<span t-field="line.name" />
+												</td>
+											</tr>
+										</t>
+									</tbody>
+								</table>
+							</div>
+							<h3 t-if="o.servicos">
+								Serviços
+							</h3>
+							<div t-if="o.servicos" class="row mt32 mb32">
+								<table class="table table-condensed" t-if="o.servicos">
+									<thead>
+										<tr>
+											<th>
+												<strong>
+													Descrição
+												</strong>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<t t-if="o.servicos">
+											<tr t-foreach="o.servicos" t-as="line">
+												<td>
+													<span t-field="line.name" />
+												</td>
+											</tr>
+										</t>
+									</tbody>
+								</table>
+							</div>
+							<h3 t-if="o.relatorios">
+								Relatório(s) de Atendimento
+							</h3>
+							<div class="row mt32 mb32">
+								<t t-if="o.relatorios">
+									<t t-foreach="o.relatorios" t-as="line">
+										<table class="table table-condensed" t-if="o.relatorios">
+											<thead>
+												<tr>
+													<th colspan="4" style="width:10%">
+														<span t-field="line.name" />
+													</th>
+												</tr>
+												<tr>
+													<th style="width:80%">
+														Descrição dos serviços
+													</th>
+													<th>
+														Dt. início
+													</th>
+													<th>
+														Dt. fim
+													</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td class="text-left">
+														<strong>
+															Defeitos:
+														</strong>
+														<span t-field="line.defeitos" />
+														<br />
+														<strong>
+															Serviços executados:
+														</strong>
+														<span t-field="line.servico_executados" />
+														<br />
+														<t t-if="line.pendencias">
+															<strong>
+																Pendências:
+															</strong>
+															<span t-field="line.pendencias" />
+														</t>
+													</td>
+												</tr>
+												<tr>
+													<t t-if="line.atendimentos">
+														<td class="text-left">
+															<t t-foreach="line.atendimentos" t-as="rline">
+																<span t-field="rline.data_ini" />
+															</t>
+														</td>
+														<td class="text-left">
+															<t t-foreach="line.atendimentos" t-as="rline">
+																<span t-field="rline.data_fim" />
+															</t>
+														</td>
+													</t>
+												</tr>
+											</tbody>
+										</table>
+									</t>
+								</t>
+							</div>
+							<div class="row mt32 mb32">
+								<div class="col-6">
+									<strong>
+										Técnico(s):
+									</strong>
+									<br />
+									<span t-if="o.relatorios">
+										<span t-foreach="o.tecnicos_id" t-as="line">
+											<span t-field="line.name" />
+											<br />
+										</span>
+									</span>
+								</div>
+								<div class="col-6">
+									Local e data: ________________,_______/______/________
+								</div>
+							</div>
+							<div class="row mt32 mb32">
+								<div class="col-6">
+									_____________________________
+									<br />
+									Assinatura Técnico
+								</div>
+								<div class="col-6">
+									____________________________________
+									<br />
+									Assinatura e Carimbo do Cliente
+								</div>
+							</div>
+							<!--
+							<div style="text-align:right;width:100%">
+							Local e data: ________________,_______/______/________
+							</div>
+							<div style="padding:10px;float:left;text-align:center;width:250px;height:100px">
+							<br/>
+							<br/>
+							_____________________________<br/>
+							Assinatura Técnico
+							
+							</div>
+							<div style="padding:10px;float:right;text-align:center;width:300px;height:100px">
+							<br/>
+							<br/>
+							____________________________________<br/>
+							Assinatura e Carimbo do Cliente
+							
+							</div>
+							-->
+							<div class="oe_structure" />
+						</div>
+					</t>
+				</t>
+			</t>
+		</template>
+	</data>
 </openerp>

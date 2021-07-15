@@ -24,6 +24,7 @@ class DgtOs(models.Model):
         ('execution_ready', 'Pronta para Execução'),
         ('under_repair', 'Em execução'),
         ('pause_repair', 'Execução Pausada'),
+        ('reproved','Reprovada'),
         ('done', 'Concluída'),
         ('cancel', 'Cancelada'),
     ]
@@ -195,6 +196,10 @@ class DgtOs(models.Model):
     relatorios = fields.One2many(
         'dgt_os.os.relatorio.servico', 'os_id', u'Relatórios',
         copy=True, readonly=False, track_visibility='onchange')
+    
+
+        
+
     sale_id = fields.Many2one(
         'sale.order', 'Cotação',
         index=True, required=False, track_visibility='onchange',
@@ -295,6 +300,12 @@ class DgtOs(models.Model):
                 tempo += rel.time_execution
             self.update({'time_execution': tempo})
 
+    #******************************************
+    #  ONCHANGES
+    #
+    #******************************************
+
+
     @api.onchange('cliente_id')
     def onchange_client_id(self):
         if self.cliente_id:
@@ -360,14 +371,33 @@ class DgtOs(models.Model):
             picking_type = picking_ref.search(
                 [('default_location_src_id', '=', self.location_id.id)])
             self.picking_type = picking_type.id
+    
+    @api.onchange('relatorios')
+    def onchange_relatorios(self):
+        _logger.debug('Onchange Relatórios')
+    
+    @api.multi
+    def verify_on_add_relatorios(self):
+        _logger.debug('INICIANDO CRIAÇÃO DE RELATÓRIOS')
+        return True
+    
+    
 
     def verify_execution_rules(self):
+        """ Verifica as regras para início da execução da OS
+        
+        """
         if self.filtered(lambda dgt_os: dgt_os.state == 'done'):
             raise UserError(_("O.S já concluída."))
         if self.filtered(lambda dgt_os: dgt_os.state == 'under_repair'):
             raise UserError(_('O.S. já em execução.'))
         return
 
+
+    #******************************************
+    #  ACTIONS
+    #
+    #******************************************
     @api.multi
     def action_draft(self):
         return self.action_repair_cancel_draft()
@@ -392,10 +422,17 @@ class DgtOs(models.Model):
         tecnicos_id = self.tecnicos_id
         motivo_chamado = ''
         servicos_executados = ''
+        tem_pendencias = False
+        pendencias=''
 
         if type_report == 'quotation':
             motivo_chamado = 'Realizar Orçamento'
             servicos_executados = 'Orçamento'
+            tem_pendencias = True
+            pendencias = 'Aprovação do orçamento'
+
+
+
         else:
             if self.maintenance_type == 'preventive':
                 motivo_chamado = 'Realizar manutenção preventiva'
@@ -420,8 +457,147 @@ class DgtOs(models.Model):
             'tecnicos_id': tecnicos_id,
             'motivo_chamado': motivo_chamado,
             'servico_executados': servicos_executados,
+            'tem_pendencias': tem_pendencias,
+            'pendencias': pendencias,
+            'maintenance_duration': 1
 
         })
+    
+     # apenas usado para teste de pegar o representante com suas comissões
+    # TODO
+    # apagar essa action após desenvolvimento
+    #
+    @api.multi
+    def action_agente(self):
+        self.set_agente_commission()
+
+    @api.multi
+    def action_quotation_start(self):
+        self.message_post(body='Iniciada orçamento da ordem de serviço!')
+        self.quotation_relatorio_service_start()
+        _logger.debug("Iniciando Orçamento")
+        res = self.write(
+            {'state': 'under_budget', 'date_start_quotation': time.strftime('%Y-%m-%d %H:%M:%S')})
+        return res
+
+    @api.multi
+    def action_quotation_pause(self):
+        self.message_post(body='Pausado orçamento da ordem de serviço!')
+        self.quotation_relatorio_service_end()
+        res = self.write({'state': 'pause_budget'})
+        return res
+
+    @api.multi
+    def action_quotation_end(self):
+        self.message_post(body='Finalizado orçamento da ordem de serviço!')
+        self.quotation_relatorio_service_end()
+        self.gera_orcamento()
+        res = self.write({'state': 'wait_authorization'})
+        return res
+
+    @api.multi
+    def action_repair_aprove(self):
+        self.message_post(body='Aprovado orçamento da ordem de serviço!')
+        if self.state != 'done':
+            res = self.write({'state': 'execution_ready'})
+        return res
+    
+    @api.multi
+    def action_repair_reprove(self):
+        self.message_post(body='Reprovado o orçamento da ordem de serviço!')
+        if self.state != 'reproved':
+            res = self.write({'state': 'reproved'})
+        return res
+
+    @api.multi
+    def action_repair_executar(self):
+
+        self.verify_execution_rules()
+        self.repair_relatorio_service_start()
+        if self.state == 'draft' or self.state == 'execution_ready':
+            _logger.debug("Criando Check List")
+            self.create_checklist()
+        self.message_post(body='Iniciada execução da ordem de serviço!')
+        res = self.write(
+            {'state': 'under_repair', 'date_start': time.strftime('%Y-%m-%d %H:%M:%S')})
+        return res
+
+    @api.multi
+    def action_pause_repair_executar(self):
+
+        self.verify_execution_rules()
+        self.create_checklist()
+        self.message_post(body='Pausada execução da ordem de serviço!')
+        res = self.write(
+            {'state': 'under_repair', 'date_start': time.strftime('%Y-%m-%d %H:%M:%S')})
+        return res
+
+    @api.multi
+    def action_repair_cancel(self):
+        self.mapped('pecas').write({'state': 'cancel'})
+        return self.write({'state': 'cancel'})
+
+    @api.multi
+    def action_repair_end(self):
+        """Finaliza execução da ordem de serviço.
+
+        @return: True
+        """
+
+        if self.filtered(lambda dgt_os: dgt_os.state != 'under_repair'):
+            raise UserError(
+                _("A ordem de serviço de estar \"em execução\" para finalizar a execução."))
+
+        if self.filtered(lambda dgt_os: dgt_os.state == 'done'):
+            raise UserError(_('Ordem já finalizada'))
+
+        if not self.relatorios:
+            raise UserError(
+                _("Para finalizar O.S. deve-se incluir pelo menos um relatório de serviço."))
+            return False
+        if self.relatorios.filtered(lambda x: x.state == 'draft'):
+            raise UserError(
+                _("Para finalizar O.S. deve-se concluir todos os relatorios de serviço."))
+            return False
+           
+
+        # verificando se pecas foram aplicadas
+        for p in self.pecas:
+            if not p.aplicada:
+                raise UserError(
+                    _("Para finalizar O.S. todas as peças devem ser aplicadas"))
+                return False
+        # if self.check_list_created:
+        for check in self.check_list:
+            if not check.check:
+                raise UserError(
+                    _("Para finalizar O.S. todas as instruções do check-list devem estar concluídas"))
+                return False
+
+        vals = {
+            'state': 'done',
+            'date_execution': time.strftime('%Y-%m-%d %H:%M:%S'),
+        }
+        # self.action_repair_done()
+        res = self.write(vals)
+        if res:
+            if self.sale_id.id:
+                _logger.debug("Cotação já foi gerada: %s", self.sale_id.name)
+            else:
+                _logger.debug("Cotação ainda não gerada. Gerando...")
+                self.gera_orcamento()
+
+            if self.request_id.id:
+                self.request_id.action_finish_request()
+                _logger.debug("Concluída Solicitação")
+            else:
+                _logger.debug("Não existe solicitação para OS. Continuando...")
+            _logger.debug("Finalizando relatorios.")
+            self.finish_report()
+            return True
+        else:
+            _logger.debug("Erro ao atualizar OS.")
+            return False
 
     def repair_relatorio_service_start(self):
         date_now = datetime.now()
@@ -434,19 +610,13 @@ class DgtOs(models.Model):
         self.relatorio_service_start(type_report)
 
     def quotation_relatorio_service_end(self):
-        date_now = datetime.now()
         type_report = 'quotation'
-        data_atendimento = date.today()
-        hora_fim = float(date_now.hour) + float(date_now.minute)/60
         relatorio_servico = self.env['dgt_os.os.relatorio.servico'].search(
-            [('os_id', '=', self.id), ('type_report', '=', type_report), ('state', '=', 'draft')])[0]
-        if relatorio_servico.id:
-            relatorio_servico.write({
-                'hora_fim': hora_fim,
-                'state': 'done',
-
-            })
-
+            [('os_id', '=', self.id), ('type_report', '=', type_report), ('state', '=', 'draft')])
+        if len(relatorio_servico) > 0:
+            raise UserError(
+                    _("Antes de finalizar você precisa concluir relatório de orçamento. "))
+                            
     def set_agente_commission(self):
         _logger.debug("pegando agente comissão")
 
@@ -566,7 +736,7 @@ class DgtOs(models.Model):
             "fiscal_position_id": self.fiscal_position_id.id,
 
         })
-        
+
         _logger.info("Sale_order gerada: %s", saleorder.name)
         _logger.debug(saleorder)
 
@@ -600,7 +770,11 @@ class DgtOs(models.Model):
         return True
 
     def add_notes_orcamento(self, saleorder):
+        """ Adiciona os notes ao orçamento da OS
+            @param saleorder cotação a qual será adicionada os notes
         
+        
+        ."""
         # Adicionandos notas
         
         name_note = "Referente ao equipamento "
@@ -627,7 +801,11 @@ class DgtOs(models.Model):
             })
 
     def add_pecas_orcamento(self, saleorder):
-
+        """ Adiciona pecas ao orçamento da OS
+            @param saleorder cotação a qual será adicionada o notes
+        
+        
+        ."""
         # Adicionando as peças
 
         # Verificando se tem pecas para adicionar
@@ -661,6 +839,11 @@ class DgtOs(models.Model):
                                 saleline.product_id.name, saleline.product_uom_qty)
     
     def add_servico_orcamento(self, saleorder):
+        """ Adiciona serviços ao orçamento da OS
+            @param saleorder cotação a qual será adicionada o serviço
+        
+        
+        ."""
         # Adicionando Servicos
 
         self.env['sale.order.line'].create({
@@ -688,133 +871,12 @@ class DgtOs(models.Model):
                             saleline.product_id.name, saleline.product_uom_qty)
 
 
-    # apenas usado para teste de pegar o representante com suas comissões
-    # TODO
-    # apagar essa action após desenvolvimento
-    #
-    @api.multi
-    def action_agente(self):
-        self.set_agente_commission()
-
-    @api.multi
-    def action_quotation_start(self):
-        self.message_post(body='Iniciada orçamento da ordem de serviço!')
-        self.quotation_relatorio_service_start()
-        _logger.debug("Iniciando Orçamento")
-        res = self.write(
-            {'state': 'under_budget', 'date_start_quotation': time.strftime('%Y-%m-%d %H:%M:%S')})
-        return res
-
-    @api.multi
-    def action_quotation_pause(self):
-        self.message_post(body='Pausado orçamento da ordem de serviço!')
-        self.quotation_relatorio_service_end()
-        res = self.write({'state': 'pause_budget'})
-        return res
-
-    @api.multi
-    def action_quotation_end(self):
-        self.message_post(body='Finalizado orçamento da ordem de serviço!')
-        self.quotation_relatorio_service_end()
-        self.gera_orcamento()
-        res = self.write({'state': 'wait_authorization'})
-        return res
-
-    @api.multi
-    def action_repair_aprove(self):
-        self.message_post(body='Aprovado orçamento da ordem de serviço!')
-        if self.state != 'done':
-            res = self.write({'state': 'execution_ready'})
-        return res
-
-    @api.multi
-    def action_repair_executar(self):
-
-        self.verify_execution_rules()
-        if self.state == 'draft' or self.state == 'execution_ready':
-            _logger.debug("Criando Check List")
-            self.create_checklist()
-        self.message_post(body='Iniciada execução da ordem de serviço!')
-        res = self.write(
-            {'state': 'under_repair', 'date_start': time.strftime('%Y-%m-%d %H:%M:%S')})
-        return res
-
-    @api.multi
-    def action_pause_repair_executar(self):
-
-        self.verify_execution_rules()
-        self.create_checklist()
-        self.message_post(body='Pausada execução da ordem de serviço!')
-        res = self.write(
-            {'state': 'under_repair', 'date_start': time.strftime('%Y-%m-%d %H:%M:%S')})
-        return res
-
-    @api.multi
-    def action_repair_cancel(self):
-        self.mapped('pecas').write({'state': 'cancel'})
-        return self.write({'state': 'cancel'})
-
-    @api.multi
-    def action_repair_end(self):
-        """Writes repair order state to 'To be invoiced' if invoice method is After
-        repair else state is set to 'Ready'.
-
-        @return: True
-        """
-
-        if self.filtered(lambda dgt_os: dgt_os.state != 'under_repair'):
-            raise UserError(
-                _("A ordem de serviço de estar \"em execução\" para finalizar a execução."))
-
-        if self.filtered(lambda dgt_os: dgt_os.state == 'done'):
-            raise UserError(_('Ordem já finalizada'))
-
-        if not self.relatorios:
-            raise UserError(
-                _("Para finalizar O.S. deve-se incluir pelo menos um relatório de serviço."))
-            return False
-        # verificando se pecas foram aplicadas
-        for p in self.pecas:
-            if not p.aplicada:
-                raise UserError(
-                    _("Para finalizar O.S. todas as peças devem ser aplicadas"))
-                return False
-        # if self.check_list_created:
-        for check in self.check_list:
-            if not check.check:
-                raise UserError(
-                    _("Para finalizar O.S. todas as instruções do check-list devem estar concluídas"))
-                return False
-
-        vals = {
-            'state': 'done',
-            'date_execution': time.strftime('%Y-%m-%d %H:%M:%S'),
-        }
-        # self.action_repair_done()
-        res = self.write(vals)
-        if res:
-            if self.sale_id.id:
-                _logger.debug("Cotação já foi gerada: %s", self.sale_id.name)
-            else:
-                _logger.debug("Cotação ainda não gerada. Gerando...")
-                self.gera_orcamento()
-
-            if self.request_id.id:
-                self.request_id.action_finish_request()
-                _logger.debug("Concluída Solicitação")
-            else:
-                _logger.debug("Não existe solicitação para OS. Continuando...")
-            _logger.debug("Finalizando relatorios.")
-            self.finish_report()
-            return True
-        else:
-            _logger.debug("Erro ao atualizar OS.")
-            return False
+   
 
     def create_checklist(self):
         """Cria a lista de verificacao caso a os seja preventiva."""
         if self.maintenance_type == 'preventive' or self.maintenance_type == 'loan' or self.maintenance_type == 'calibration':
-            _logger.debug("Criando Checklis")
+            _logger.debug("Criando Checklist")
             instructions = self.env['maintenance.equipment.category.vl'].search(
                 [('category_id.name', '=', self.equipment_id.category_id.name)])
             os_check_list = self.env['dgt_os.os.verify.list'].search(
@@ -823,7 +885,7 @@ class DgtOs(models.Model):
             for i in instructions:
                 instructions = os_check_list.create(
                     {'dgt_os': self.id, 'instruction': str(i.name)})
-                _logger.debug(instructions)
+                _logger.debug(i)
 
             self.check_list_created = True
 

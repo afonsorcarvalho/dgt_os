@@ -15,6 +15,7 @@
 						<button name="force_parts_reservation" states="released" string="Forçar Reserva" type="object" />
 						<button name="action_repair_end" states="under_repair" type="object" string="Finalizar Execução" class="oe_highlight" attrs="{'invisible':[('state', 'not in',('under_repair'))]}" />
 						<button name="action_repair_aprove" string="Aprovar" type="object" groups="base.group_no_one" attrs="{'invisible':[('state', 'not in',('wait_authorization'))]}" />
+						<button name="action_repair_reprove" string="Reprovar" type="object" groups="base.group_no_one" attrs="{'invisible':[('state', 'not in',('wait_authorization'))]}" />
 						<button name="action_repair_cancel" string="Cancelar" type="object" groups="base.group_no_one" />
 						<button name="action_draft" string="Rascunho" type="object" groups="base.group_no_one" />
 						<!-- Botao para mandar a os por e-email -->
@@ -83,14 +84,28 @@
 						</group>
 						<group>
 							<field name="description" string="Descrição da O.S." attrs="{'readonly':[('state','=', 'done')]}" />
+						
 						</group>
 						<separator />
-						<notebook>
+						<notebook attrs="{'invisible':[('state','=','draft')]}">
 							<page string="Relatórios" attrs="{'invisible':[('state','=','draft')]}">
-								<field name="relatorios" mode="tree" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}">
+								
+								<field name="relatorios"
+								   context="{'default_os_id': id }" mode="tree"
+								   attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}">
 									
-									<tree string="Relatórios" decoration-success="state=='done'" decoration-danger="state=='draft'">
-										<field name="name" string="Relatório" />
+									
+									
+									
+									
+									
+									
+									<tree string="Relatórios" decoration-success="state=='done'" decoration-danger="state=='draft'" create="0" delete="0">
+									
+								
+									
+								
+									    <field name="name" string="Relatório" />
 										<field name="tecnicos_id" widget="many2many_tags" />
 										<field name="relatorio_num" string="Relatório Nº." />
 										<field name="equipment_id" string="Equipamento" invisible="True" />
@@ -104,7 +119,7 @@
 									</tree>
 								</field>
 							</page>
-							<page string="Peças">
+							<page string="Peças" attrs="{'invisible':[('state','=','draft')]}">
 								<field name="pecas" nolabel="1" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}">
 									<form string="Peças">
 										<notebook>
@@ -135,7 +150,7 @@
 								</field>
 								<div class="oe_clear" />
 							</page>
-							<page string="Serviços">
+							<page string="Serviços" attrs="{'invisible':[('state','=','draft')]}">
 								<field name="servicos" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}">
 									<form string="Serviços">
 										<notebook>
@@ -172,7 +187,7 @@
 									</tree>
 								</field>
 							</page>
-							<page string="Assinatura">
+							<page string="Assinatura" attrs="{'invisible':[('state','=','draft')]}">
 								<group>
 									<field name="name_digital_signature_client" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}" />
 									<field name="signature_client_date" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}" />

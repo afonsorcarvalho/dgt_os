@@ -59,6 +59,8 @@ class DgtOsPecasLine(models.Model):
 	@api.depends('product_uom_qty', 'product_id')
 	def _compute_peca_disponivel(self):
 		self.qty_available = self.product_id.qty_available
+	
+	
 		
 	def action_aplicar_pecas(self):
 		_logger.info("aplicando peças:")

@@ -3,6 +3,10 @@ import time
 from datetime import date, datetime, timedelta
 from odoo import models, fields, api, _, SUPERUSER_ID
 
+import logging
+
+_logger = logging.getLogger(__name__)
+
 class RelatoriosServico(models.Model):
     _name = 'dgt_os.os.relatorio.servico'
     _inherit = ['mail.thread']
@@ -17,10 +21,10 @@ class RelatoriosServico(models.Model):
     type_report = fields.Selection(string='Tipo de Relatório', selection=[(
         'quotation', 'Orçamento'), ('repair', 'Manutenção'),('instalation', 'Instalação'), ('calibrate', 'Calibração')], default="repair")
     parts_request = fields.One2many(
-        'dgt_os.os.pecas.line', 'relatorio_aplication_id', 'Pecas Requisitadas',
+        'dgt_os.os.pecas.line', 'relatorio_request_id', 'Pecas Requisitadas',
         copy=True)
     parts_application = fields.One2many(
-        'dgt_os.os.pecas.line', 'relatorio_request_id', 'Pecas Aplicadas',
+        'dgt_os.os.pecas.aplication.line', 'relatorio_aplication_id', 'Pecas Aplicadas',
         copy=True)
     os_id = fields.Many2one(
         'dgt_os.os', 'Ordem de serviço',
@@ -42,7 +46,16 @@ class RelatoriosServico(models.Model):
         compute='_compute_relatorio_default',
         store=True,
         index=True,
+        
+    
+        
         help='Escolha o equipamento referente ao Relatorio de Servico.')
+    situation_id = fields.Many2one(
+        'dgt_os.equipment.situation',
+        string='Estado do Equipamento',
+        required=True
+        
+        )
     tecnicos_id = fields.Many2many(
         'hr.employee',
         string='Técnicos')
@@ -58,6 +71,14 @@ class RelatoriosServico(models.Model):
     #	 readonly=False)
     time_execution = fields.Float(
         String='tempo execução', compute='_compute_time_execution', store=True)
+    
+    maintenance_duration = fields.Float(
+        "Tempo Estimado",
+        readonly=False,
+        
+        help='Tempo estimado que será utilizado para contabilizar o valor da mão de obra no orçamento'
+        
+        )
 
     # assinatura digital
     name_digital_signature_client = fields.Char(
@@ -85,8 +106,11 @@ class RelatoriosServico(models.Model):
     digital_signature_client = fields.Binary(string='Assinatura Cliente')
    
     def set_is_sign_client(self):
-        self.is_sign_client  = 1
+        self.is_sign_client = 1
+    
+  
 
+    
     
     
  
@@ -115,6 +139,33 @@ class RelatoriosServico(models.Model):
         self.motivo_chamado = self.os_id.description
         if self.os_id.state == 'under_budget':
             self.servico_executados = 'Realizado Orçamento'
+    
+
+
+    @api.multi
+    def aplicar_pecas(self):
+        _logger.debug("APLICANDO PEÇAS")
+        pecas_aplicadas = self.parts_application
+        for peca in pecas_aplicadas:
+            peca.parts_request.write({'aplicada':True})
+            _logger.debug(peca.parts_request.id)
+            _logger.debug(peca.parts_request.aplicada)
+
+
+
+    @api.multi
+    def action_done(self):
+        
+        _logger.debug("CONCLUINDO RELATORIO")
+        self.aplicar_pecas()
+        self.write({'state': 'done'})
+        return
+    
+    @api.multi
+    def action_atualizar(self):
+        _logger.debug("ATUALIZANDO RELATORIO")
+
+
 
 
 class RelatoriosAtendimentoLines(models.Model):
@@ -142,3 +193,31 @@ class RelatoriosAtendimentoLines(models.Model):
             if data_fim.time() < data_ini.time():
                 raise UserError(
                     _("Hora da data de final do relatório menor que a hora da data de inicio."))
+
+    @api.model
+    def create(self, values):
+        result = super().create(values)
+        _logger.debug("CRIANDO RELATÓRIO")
+        return result
+
+   
+    
+class PecasAplicationLine(models.Model):
+
+    _name = 'dgt_os.os.pecas.aplication.line'
+    parts_request = fields.Many2one(
+        'dgt_os.os.pecas.line', 'Pecas Aplicadas',
+        copy=True)
+    relatorio_aplication_id = fields.Many2one(
+        'dgt_os.os.relatorio.servico',
+        string='RAT Aplicado',
+        )
+    os_id = fields.Many2one(
+        'dgt_os.os', 'Ordem de serviço',
+        index=True, ondelete='cascade')
+
+    _sql_constraints = [
+
+        ('parts_uniq', 'unique (parts_request)', 'A mesma peça foi aplicada mais de uma vez !')
+
+    ]

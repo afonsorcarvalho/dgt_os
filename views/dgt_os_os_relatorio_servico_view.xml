@@ -1,98 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 	<data>
-		<record id="dgt_os_0s_relatorio_servico_form" model="ir.ui.view">
+		<record id="dgt_os_os_relatorio_servico_form" model="ir.ui.view">
 			<field name="name">dgt_os.os.relatorio.servico.form</field>
 			<field name="model">dgt_os.os.relatorio.servico</field>
 			<field name="arch" type="xml">
 				<form string="Relatórios">
 					<header>
+						<button name="action_done" class="oe_highlight" string="Concluir" type="object" default_focus="0" icon="fa-check" confirm="Você tem certeza que deseja concluir?" help="Concluindo esse relatório não poderá mais alterá-lo" />
+						<button name="action_atualizar" class="oe_highlight" string="Atualizar" type="object" default_focus="1" />
 						<field name="state" widget="statusbar" />
 					</header>
-					    <group>
-                            <group>
-                                <field name="id" />
-                                <field name="name" string="Relatório" />
-                                <field name="relatorio_num" string="Relatório Nº." />
-                                <field name="data_atendimento" string="Data de atendimento" />
-                                <field name="equipment_id" string="Equipamento" />
-                                <field name="type_report" string="Tipo de Relatório" required="1" />
-                                <field name="os_id" />
-                            </group>
-                            <group>
-                                <field name="hora_inicio" string="Hora de inicio" widget="float_time" />
-                                <field name="hora_termino" string="Hora de termino" widget="float_time" />
-                                <field name="tecnicos_id" widget="many2many_tags" required="1" />
-                            </group>
-                        
+					<group>
+						<group attrs="{'readonly':[('state','=', 'done')]}">
+							<field name="id" />
+							<field name="name" string="Relatório" attrs="{'readonly':[('state','=', 'done')]}" />
+							<field name="relatorio_num" string="Relatório Nº." attrs="{'readonly':[('state','=', 'done')]}" />
+							<field name="data_atendimento" string="Data de atendimento" attrs="{'readonly':[('state','=', 'done')]}" />
+							<field name="equipment_id" string="Equipamento" required="1" attrs="{'readonly':[('state','=', 'done')]}" />
+							<field name="situation_id" attrs="{'readonly':[('state','=', 'done')]}" required="1" />
+							<field name="type_report" string="Tipo de Relatório" required="1" attrs="{'readonly':[('state','=', 'done')]}" />
+							<field name="os_id" attrs="{'readonly':[('state','=', 'done')]}" />
 						</group>
 						<group>
-								
-									<field name="motivo_chamado" string="Motivo do Chamado" required="1" />
-									<field name="tem_defeitos" string="Tem defeitos?" />
-									<field name="defeitos" string="Defeitos" attrs="{'invisible': [('tem_defeitos', '=', False)], 'required':[('tem_defeitos','=',True)]}" />
-									<field name="servico_executados" string="Serviços Executados" required="1" />
-									<field name="tem_pendencias" string="Tem pendências?" />
-									<field name="pendencias" string="Pendências" attrs="{'invisible': [('tem_pendencias', '=', False)], 'required':[('tem_pendencias','=',True)]}" />
-									<field name="time_execution" string="Tempo de execução" readonly="True" widget="float_time" />
-								
+							<field name="hora_inicio" string="Hora de inicio" widget="float_time" attrs="{'readonly':[('state','=', 'done')]}" />
+							<field name="hora_termino" string="Hora de termino" widget="float_time" attrs="{'readonly':[('state','=', 'done')]}" />
+							<field name="tecnicos_id" widget="many2many_tags" required="1" attrs="{'readonly':[('state','=', 'done')]}" />
 						</group>
-                     
-                       
-                            
-               
-                            <notebook>
-                                <page string="Relação de peças">
-                                  
-                                        <field name="parts_request" context="{'default_os_id': os_id,'default_relatorio_request_id':id }" nolabel="1" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}">
-                                            <form string="Peças">
-                                                <group>
-                                                    <field name="aplicada" string="Status" 
-                                                    readonly="1"
-                                                    />
-                                                    <field name="os_id" />
-                                                    <field name="product_id" />
-                                                    <field name="name" />
-                                                </group>
-                                                <group>
-                                                    <field name="qty_available" string="Qtd Disp." />
-                                                    <field name="product_uom_qty" string="Qtd" />
-                                                    <field name="product_uom" string="Unidade" />
-                                                </group>
-                                            </form>
-                                            <tree string="Pecas Solicitadas" editable="bottom">
-                                                <!-- <field name="sequence" widget="handle"/> -->
-                                                <field name="aplicada" />
-                                                <button  string="Aplicar" name="action_aplicar_peca" type="object" class="oe_highlight" />
-                                                <field name="product_id" />
-                                                <field name="os_id" 
-                                                invisible="1"
-                                                    />
-                                                <field name="relatorio_aplication_id" string="RAT Ap."/>
-                                                <field name="relatorio_request_id" string="RAT Req."/>
-                                                <field name="name" 
-                                                invisible="1"
-                                                    />
-                                                <field name="lot_id" domain="[('product_id', '=', product_id)]" context="{'default_product_id': product_id}" groups="stock.group_production_lot" />
-                                                <field name="qty_available" string="Qtd Disp." />
-                                                <field name="product_uom_qty" string="Qtd Solic." />
-                                                <field name="product_uom" string="Unit of Measure" groups="product.group_uom" />
-                                            </tree>
-                                        </field>
-                                        <div class="oe_clear" />
-                                      
-                                </page>
-                            </notebook>
-                            <group>
-                                <field name="name_digital_signature_client" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}" />
-                                <field name="type_document_signature_client" />
-                                <field name="document_digital_signature_client" />
-                                <field name="signature_client_date" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}" />
-                                <field name="is_sign_client" />
-                                <field name="digital_signature_client" widget="signature" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}" />
-                            </group>
-                       
-					
+					</group>
+					<group>
+						<field name="motivo_chamado" string="Motivo do Chamado" required="1" attrs="{'readonly':[('state','=', 'done')]}" />
+						<field name="tem_defeitos" string="Tem defeitos?" attrs="{'readonly':[('state','=', 'done')]}" />
+						<field name="defeitos" string="Defeitos" attrs="{'invisible': [('tem_defeitos', '=', False)], 'required':[('tem_defeitos','=',True)],'readonly':[('state','=', 'done')]}" />
+						<field name="servico_executados" string="Serviços Executados" required="1" attrs="{'readonly':[('state','=', 'done')]}" />
+						<field name="tem_pendencias" string="Tem pendências?" attrs="{'readonly':[('state','=', 'done')]}" />
+						<field name="pendencias" string="Pendências" attrs="{'invisible': [('tem_pendencias', '=', False)], 'required':[('tem_pendencias','=',True)],'readonly':[('state','=', 'done')]}" />
+						<field name="maintenance_duration" string="Tempo Estimado" widget="float_time" attrs="{'required':[('type_report','=','quotation')],'readonly':[('state','=', 'done')]}" />
+						<field name="time_execution" string="Tempo de execução" readonly="True" widget="float_time" attrs="{'readonly':[('state','=', 'done')]}" />
+					</group>
+					<notebook>
+						<page string="Relação de peças requisitadas">
+							<field name="parts_request" context="{'default_os_id': os_id,'default_relatorio_request_id':id }" nolabel="1" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}">
+								<form string="Peças">
+									<group>
+										<field name="aplicada" string="Status" readonly="1" />
+										<field name="os_id" />
+										<field name="product_id" />
+										<field name="name" />
+									</group>
+									<group>
+										<field name="qty_available" string="Qtd Disp." />
+										<field name="product_uom_qty" string="Qtd" />
+										<field name="product_uom" string="Unidade" />
+									</group>
+								</form>
+								<tree string="Pecas Solicitadas" editable="bottom">
+									<!-- <field name="sequence" widget="handle"/> -->
+									<field name="aplicada" string="Status" readonly="1" />
+									<field name="product_id" />
+									<field name="os_id" context="{'os_id': os_id }" invisible="0" />
+									<field name="relatorio_aplication_id" string="RAT Ap." />
+									<field name="relatorio_request_id" string="RAT Req." />
+									<field name="name" invisible="1" />
+									<field name="lot_id" domain="[('product_id', '=', product_id)]" context="{'default_product_id': product_id}" groups="stock.group_production_lot" />
+									<field name="qty_available" string="Qtd Disp." />
+									<field name="product_uom_qty" string="Qtd Solic." />
+									<field name="product_uom" string="Unit of Measure" groups="product.group_uom" />
+								</tree>
+							</field>
+							<div class="oe_clear" />
+						</page>
+						<page string="Relação de peças aplicadas" attrs="{'invisible':[('type_report','!=','repair'),('type_report','!=','instalation')]}">
+							<field name="parts_application" nolabel="1" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}" context="{'default_relatorio_aplication_id': id,'default_os_id':os_id }">
+								<tree string="Peças aplicadas" editable="bottom">
+									<field name="parts_request" domain="[('os_id', '=', os_id),('aplicada','=', False) ]" options="{'no_create_edit': True}" required="1" />
+									<field name="relatorio_aplication_id" required="1" />
+									<field name="os_id" required="1" />
+								</tree>
+							</field>
+							<div class="oe_clear" />
+						</page>
+					</notebook>
+					<group>
+						<field name="name_digital_signature_client" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}" />
+						<field name="type_document_signature_client" />
+						<field name="document_digital_signature_client" />
+						<field name="signature_client_date" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}" />
+						<field name="is_sign_client" />
+						<field name="digital_signature_client" widget="signature" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}" />
+					</group>
 				</form>
 			</field>
 		</record>
