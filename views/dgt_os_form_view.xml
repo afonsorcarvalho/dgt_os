@@ -26,7 +26,7 @@
 						<div class="oe_button_box" name="button_box">
 							<button type="object" class="oe_right oe_stat_button" string="Garantia" icon="fa-check" name="action_is_warranty">
 								<!-- <field name="is_warranty" widget="boolean_button" options="{'terminology':{'string_true':'Garantia','hover_true':'OS em garantia','string_false':'Normal','hover_false':'OS normal'}}" /> -->
-								<field name="is_warranty" widget="stateinfo" readonly="True" />
+								
 							</button>
 							<button type="action" class="oe_right oe_stat_button" icon="fa-calculator" name="%(sale_management.sale_order_view_tree)d">
 								<!-- <field name="is_warranty" widget="boolean_button" options="{'terminology':{'string_true':'Garantia','hover_true':'OS em garantia','string_false':'Normal','hover_false':'OS normal'}}" /> -->
@@ -41,6 +41,7 @@
 								<field name="cliente_id" attrs="{'readonly':[('state','not in','draft')]}" />
 								<field name="equipment_id" attrs="{'readonly':[('state','not in','draft')]}" domain="[('client_id.id', '=', cliente_id)]" />
 								<field name="equipment_location" />
+
 								<field name="priority" widget="priority" />
 								<field name="gerado_cotacao" groups="base.group_no_one" />
 								<field name="analytic_account_id" />
@@ -58,6 +59,10 @@
 							<group>
 								<field name="tecnicos_id" widget="many2many_tags" domain="[('job_id', '=', 'TECNICO')]" attrs="{'readonly':[('state','=', 'done')]}" />
 								<field name="maintenance_type" string="Tipo de Manutenção" attrs="{'readonly':[('state','!=', 'draft')]}" />
+								<field name="is_warranty" attrs="{'readonly':[('state','!=', 'draft')]}" />
+								<field name="warranty_type" widget="stateinfo" 
+								attrs="{'required':[('is_warranty','==', True)], 'invisible':[('is_warranty','==', False)], 'readonly':[('state','!=', 'draft')]}"
+								 />
 								<field name="origin" string="Doc Origem" readonly="True" />
 								<field name="create_date" string="Data de Criação" readonly="True" />
 								<field name="sale_id" readonly="True" />

@@ -393,6 +393,14 @@ class DgtOs(models.Model):
             raise UserError(_('O.S. já em execução.'))
         return
 
+    
+
+
+
+
+
+        
+   
 
     #******************************************
     #  ACTIONS
@@ -777,8 +785,8 @@ class DgtOs(models.Model):
         ."""
         # Adicionandos notas
         
-        name_note = "Referente ao equipamento "
-
+        name_note = "Referente ao Ordem de Serviço "
+        name_note = name_note + "nº " + self.display_name + " do Equipamento "
         if self.equipment_id.name:
             name_note = name_note + self.equipment_id.name
         #if self.equipment_id.category_id.name: name_note = name_note + self.equipment_id.category_id.name
@@ -787,6 +795,7 @@ class DgtOs(models.Model):
                 str(self.equipment_serial_number)
         if self.equipment_model:
             name_note = name_note + " Modelo: " + str(self.equipment_model)
+        
 
         _logger.debug(
                 "Adicionando notas explicativas da cotação: %s", name_note)

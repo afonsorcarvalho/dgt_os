@@ -158,6 +158,7 @@ class RelatoriosServico(models.Model):
         
         _logger.debug("CONCLUINDO RELATORIO")
         self.aplicar_pecas()
+        self.change_equipment_situation()
         self.write({'state': 'done'})
         return
     
@@ -165,7 +166,13 @@ class RelatoriosServico(models.Model):
     def action_atualizar(self):
         _logger.debug("ATUALIZANDO RELATORIO")
 
+    def change_equipment_situation(self):
+        _logger.debug("MUDANDO SITUAÇÃO DO EQUIPAMENTO:")
+        _logger.debug(self.situation_id)
 
+        self.equipment_id.write(
+            {'situation_id': self.situation_id.id}
+        )
 
 
 class RelatoriosAtendimentoLines(models.Model):
