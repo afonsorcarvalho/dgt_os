@@ -393,15 +393,7 @@ class DgtOs(models.Model):
             raise UserError(_('O.S. já em execução.'))
         return
 
-    
-
-
-
-
-
-        
-   
-
+  
     #******************************************
     #  ACTIONS
     #
@@ -482,12 +474,39 @@ class DgtOs(models.Model):
     @api.multi
     def action_quotation_start(self):
         self.message_post(body='Iniciada orçamento da ordem de serviço!')
+        if(self.maintenance_type == 'corrective'):
+            self.verify_others_os_open()
+
         self.quotation_relatorio_service_start()
         _logger.debug("Iniciando Orçamento")
         res = self.write(
             {'state': 'under_budget', 'date_start_quotation': time.strftime('%Y-%m-%d %H:%M:%S')})
+        self.add_service()
         return res
 
+    def verify_others_os_open(self):
+        domain = ['&',
+            ('maintenance_type', '=', 'corrective'),
+            ('equipment_id', '=', self.equipment_id.id),
+            ('state', '!=', 'draft'),
+            ('state', '!=', 'cancel'),
+            ('state', '!=', 'done'),
+            ('state', '!=', 'reproved'),
+            ('state', '!=', 'wait_authorization'),
+            ('id', '!=', self.id),
+        ]
+        result = self.env['dgt_os.os'].search(domain)
+        _logger.debug("Verificando outras OSES")
+        _logger.debug(result)
+        message_oses = 'Não é possível executar ação. Já existe(m) OS(s) para manutenção corretiva aberta desse equipamento:\n '
+        
+        for res in result:
+            message_oses += res.name + '\n'
+        
+        if len(result) > 0:
+            raise UserError(message_oses)
+
+        
     @api.multi
     def action_quotation_pause(self):
         self.message_post(body='Pausado orçamento da ordem de serviço!')
@@ -495,11 +514,13 @@ class DgtOs(models.Model):
         res = self.write({'state': 'pause_budget'})
         return res
 
+    #TODOProcurar se é contrato com peças e o orçamento ser autorizado automaticamente.
     @api.multi
     def action_quotation_end(self):
         self.message_post(body='Finalizado orçamento da ordem de serviço!')
         self.quotation_relatorio_service_end()
         self.gera_orcamento()
+        
         res = self.write({'state': 'wait_authorization'})
         return res
 
@@ -879,7 +900,105 @@ class DgtOs(models.Model):
             _logger.debug("Adicionado serviço %s, qty %s",
                             saleline.product_id.name, saleline.product_uom_qty)
 
+    
 
+    def add_service(self):
+        """
+            Adiciona serviço de acordo com a OS
+            Verifica se equipamento em garantia, serviço em contrato e coloca o serviço adequado
+        """
+        _logger.debug("adicionando serviço...")
+        _logger.debug(self.contrato) 
+        _logger.debug("procurando serviço já adicionados na OS")
+
+        added_services = self.env['dgt_os.os.servicos.line'].search([('os_id', '=',self.id )], offset=0, limit=None, order=None, count=False)
+        servicos_line = []
+
+        _logger.debug("Serviços achados para OS")
+        for serv_line in added_services: 
+            servicos_line.append(serv_line.product_id)
+            _logger.debug(serv_line.product_id.name)
+        
+          
+        _logger.debug("Serviços Padrão")
+        service_default = self.env['product.product'].search([('name','ilike','Manutenção Geral')], limit=1)
+        _logger.debug(service_default.name)
+    
+        if not service_default.id:
+            raise UserError(_("Serviço padrão não configurado. Favor configurá-lo. Adicione o serviço 'Manutenção Geral'"))
+        product_id = service_default
+        
+            
+        if self.contrato.id:
+            _logger.debug("Mudando serviço pois existe contrato para esse equipamento:")
+            _logger.debug("Colocando serviço padrão para contrato:")
+            if self.contrato.service_product_id.id:
+                #verificando se tem esse serviço ja foi adicionado
+                if self.contrato.service_product_id in servicos_line:
+                    _logger.debug("Já existe serviço adicionado: %s", self.contrato.service_product_id.name)
+                else:
+                    _logger.debug("Serviço adicionado: %s", self.contrato.service_product_id.name)
+                    product_id = self.contrato.service_product_id
+        if self.is_warranty:
+            if self.warranty_type == "fabrica":
+                _logger.debug("Serviço em garantia fabrica")
+                service_warranty = self.env['product.product'].search([('name','ilike','Serviço em garantia de fábrica')], limit=1)
+                if not service_warranty.id:
+                    raise UserError(_("Serviço garantia não configurado. Favor configurá-lo. Adicione o serviço 'Serviço em garantia de fábrica'"))
+                
+            else:
+                _logger.debug("Serviço em garantia própria")
+                service_warranty = self.env['product.product'].search([('name','ilike','Serviço em garantia')], limit=1)
+                if not service_warranty.id:
+                    raise UserError(_("Serviço garantia não configurado. Favor configurá-lo. Adicione o serviço 'Serviço em garantia'"))
+
+            product_id= service_warranty
+            
+        _logger.debug("Verificando tempo para adicionar no serviço")
+        if self.time_execution > 0:
+            _logger.debug("Colocado tempo de execução no serviço: %s",self.time_execution )
+            product_uom_qty = self.time_execution
+            
+        else:
+            _logger.debug("Colocado tempo estimado no serviço: %s", self.maintenance_duration)
+            product_uom_qty = self.maintenance_duration
+        _logger.debug("Create servicos line:")
+
+        if self.description:
+            name = self.description
+        else:
+            name = product_id.display_name
+
+        if len(servicos_line) == 0:
+            _logger.debug("Serviços sera adicionado")
+            self.servicos = [(0,0,{
+                    'os_id' : self.id,
+                    'automatic': True,
+                    'name': name,
+                    'product_id' : product_id.id,
+                    'product_uom': product_id.uom_id.id,
+                    'product_uom_qty' : product_uom_qty
+                })]
+            _logger.debug( self.servicos)
+        else: 
+            _logger.debug("Serviços sera apenas atualizado")
+            for servico in added_services:
+             
+                if servico.automatic:
+                    _logger.debug("Encontrado servicos adicionados automaticamente, atualizando")
+                    self.servicos = [(1,servico.id,{
+                            'os_id' : self.id,
+                            'automatic': True,
+                            'name': name,
+                            'product_id' : product_id.id,
+                            'product_uom': product_id.uom_id.id,
+                            'product_uom_qty' : product_uom_qty
+                        })]
+
+     
+
+                
+        return self.servicos
    
 
     def create_checklist(self):
