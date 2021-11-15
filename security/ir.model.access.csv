@@ -2,9 +2,15 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_dgt_os_os_user,access.dgt_os.os.user,model_dgt_os_os,base.group_user,1,0,0,0
 access_dgt_os_os_tecnico,access.dgt_os.os.tecnico,model_dgt_os_os,base.group_user,1,1,1,0
 access_dgt_os_os_manager,access.dgt_os.os.manager,model_dgt_os_os,base.group_system,1,1,1,1
+
 access_dgt_os_os_request_user,access.dgt_os.os.request.user,model_dgt_os_os_request,base.group_user,1,0,0,0
 access_dgt_os_os_request_tecnico,access.dgt_os.os.request.tecnico,model_dgt_os_os_request,base.group_user,1,1,1,0
 access_dgt_os_os_request_manager,access.dgt_os.os.request.manager,model_dgt_os_os_request,group_at_manager,1,1,1,1
+
+access_dgt_os_os_plantao_viagem_user,access_dgt_os_os_plantao_viagem_user,model_dgt_os_os_plantao_viagem,base.group_user,1,0,0,0
+access_dgt_os_os_plantao_viagem_tecnico,access_dgt_os_os_plantao_viagem_tecnico,model_dgt_os_os_plantao_viagem,base.group_user,1,1,1,0
+access_dgt_os_os_plantao_viagem_manager,access_dgt_os_os_plantao_viagem_manager,model_dgt_os_os_plantao_viagem,group_at_manager,1,1,1,1
+
 access_dgt_os_os_pecas_line_manager,access.dgt_os.os.pecas.line.manager,model_dgt_os_os_pecas_line,group_at_manager,1,1,1,1
 access_dgt_os_os_servicos_line_manager,access.dgt_os.os.servicos.line.manager,model_dgt_os_os_servicos_line,group_at_manager,1,1,1,1
 access_dgt_os_os_relatorio_servico_manager,access.dgt_os.os.relatorio.servico.manager,model_dgt_os_os_relatorio_servico,group_at_manager,1,1,1,1
@@ -18,4 +24,4 @@ access_dgt_os_equipment_location,access_dgt_os_equipment_location,dgt_os.model_d
 access_dgt_os_equipment_situation,access_dgt_os_equipment_situation,dgt_os.model_dgt_os_equipment_situation,group_at_manager,1,1,1,1
 access_dgt_os_equipment_means_of_aquisition,access_dgt_os_equipment_means_of_aquisition,dgt_os.model_dgt_os_equipment_means_of_aquisition,group_at_manager,1,1,1,1
 access_dgt_os_os_pecas_applicaton_line_manager, access_dgt_os_os_pecas_applicaton_line_manager,dgt_os.model_dgt_os_os_pecas_aplication_line,group_at_manager,1,1,1,1
-
+access_dgt_os_os_pecas_requisition_line_manager,access_dgt_os_os_pecas_requisition_line_manager,dgt_os.model_dgt_os_os_pecas_requisition_line,group_at_manager,1,1,1,1

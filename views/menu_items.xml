@@ -33,6 +33,12 @@
 			parent="dgt_os_menu_servicos"
 			sequence="4"/>	
 
+		<menuitem name="Plantões e Viagens"
+			action="action_window_plantao_viagem"
+			id="dgt_os_menu_plantao_viagem_list"
+			parent="dgt_os_menu_servicos"
+			sequence="5"/>	
+
 		<!--Menus pegados do modulo Maintenance-->
 
 		<menuitem

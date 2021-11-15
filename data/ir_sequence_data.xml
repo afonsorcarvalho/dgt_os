@@ -26,5 +26,13 @@
             <field eval="False" name="company_id"/>
             <field name="padding">4</field>
         </record>
+		<record id="seq_os_plantao_viagem" model="ir.sequence">
+            <field name="name">Plantões e Viagens</field>
+            <field name="code">dgt_os.os.plantao.viagem</field>
+			<field name="prefix">RDV/%(range_year)s/</field>
+			<field eval="True" name="use_date_range"/>
+            <field eval="False" name="company_id"/>
+            <field name="padding">5</field>
+        </record>
     </data>
 </odoo>

@@ -15,8 +15,12 @@ class DgtOsPecasLine(models.Model):
 	os_id = fields.Many2one(
 		'dgt_os.os', 'Repair Order Reference',
 		index=True, ondelete='cascade')
+	
 	relatorio_request_id = fields.Many2one('dgt_os.os.relatorio.servico', 'Relatório Solicitante')
 	relatorio_aplication_id = fields.Many2one('dgt_os.os.relatorio.servico', 'Relatório Peça Aplicada')
+	relatorio_parts_id = fields.Many2one(
+		'dgt_os.os.pecas.requisition.line', 'Id peça requisitada',
+		index=True)
 	aplicada = fields.Boolean('Aplicada', copy=False)
 	to_invoice = fields.Boolean('Faturar')
 	product_id = fields.Many2one('product.product', u'Peças', required=True)

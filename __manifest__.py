@@ -50,6 +50,7 @@
 		'views/dgt_os_request_view.xml',
         'views/dgt_os_os_relatorio_servico_view.xml',
         'views/dgt_os_form_view.xml',
+        'views/dgt_os_plantao_viagem.xml',
         'views/equipment_view.xml',
         'views/equipment_category_view.xml',
         'views/maintenance_team_view.xml',

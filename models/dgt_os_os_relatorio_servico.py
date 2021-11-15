@@ -1,6 +1,7 @@
 
 import time
 from datetime import date, datetime, timedelta
+from odoo.addons import decimal_precision as dp
 from odoo import models, fields, api, _, SUPERUSER_ID
 
 import logging
@@ -21,7 +22,7 @@ class RelatoriosServico(models.Model):
     type_report = fields.Selection(string='Tipo de Relatório', selection=[(
         'quotation', 'Orçamento'), ('repair', 'Manutenção'),('instalation', 'Instalação'), ('calibrate', 'Calibração')], default="repair")
     parts_request = fields.One2many(
-        'dgt_os.os.pecas.line', 'relatorio_request_id', 'Pecas Requisitadas',
+        'dgt_os.os.pecas.requisition.line', 'relatorio_id', 'Pecas Requisitadas',
         copy=True)
     parts_application = fields.One2many(
         'dgt_os.os.pecas.aplication.line', 'relatorio_aplication_id', 'Pecas Aplicadas',
@@ -174,6 +175,24 @@ class RelatoriosServico(models.Model):
             {'situation_id': self.situation_id.id}
         )
 
+@api.multi
+def write(self, values):
+    """
+        Update all record(s) in recordset, with new value comes as {values}
+        return True on success, False otherwise
+
+        @param values: dict of new values to be set
+
+        @return: True on success, False otherwise
+    """
+    _logger.debug("Update Relatorio de serviço")
+    result = super(RelatoriosServico, self).write(values)
+    self.update_parts_os()
+    return result
+
+
+   
+
 
 class RelatoriosAtendimentoLines(models.Model):
     # TODO remover esse model e fazer a migração dos dados
@@ -207,7 +226,31 @@ class RelatoriosAtendimentoLines(models.Model):
         _logger.debug("CRIANDO RELATÓRIO")
         return result
 
-   
+class PecasRequisitionLine(models.Model):
+
+    _name = 'dgt_os.os.pecas.requisition.line'
+    parts_request = fields.Many2one('product.product', u'Peças', required=True)
+    product_uom_qty = fields.Float(
+		'Qtd', default=1.0,
+		digits=dp.get_precision('Product Unit of Measure'), required=True)
+    relatorio_id = fields.Many2one(
+        'dgt_os.os.relatorio.servico',
+        string='RAT Requisitante',
+        )
+    #id da peça que está na OS para fazer uma relação, na hora de atualiza ou excluir
+    os_pecas_id = fields.Many2one( 
+        'dgt_os.os.pecas.line',  'Pecas')
+
+    os_id = fields.Many2one(
+        'dgt_os.os', 'Ordem de serviço',
+        index=True, ondelete='cascade')
+    
+
+    _sql_constraints = [
+
+        ('parts_uniq', 'unique (parts_request)', 'A mesma peça foi requisitada mais de uma vez !')
+
+    ] 
     
 class PecasAplicationLine(models.Model):
 
