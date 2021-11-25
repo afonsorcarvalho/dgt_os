@@ -9,3 +9,4 @@ class Partner(models.Model):
         'account.payment.term',
         string='Condições de Pagamento'
     )
+    valor_diaria = fields.Float("Valor diária")

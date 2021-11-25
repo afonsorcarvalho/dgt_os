@@ -43,6 +43,7 @@
     'data': [
 		'security/at_security.xml',
 	    'security/ir.model.access.csv',
+        'views/res_partner_view.xml',
         'wizard/relatorio_os.xml',
         'views/sale_view.xml',
 		'views/dgt_os_pecas_line_view.xml',
@@ -56,6 +57,7 @@
         'views/maintenance_team_view.xml',
         'views/menu_items.xml',
         'views/product_category.xml',
+        
 	    'reports/reports.xml',
        	'reports/report_base_ordem.xml',
 	    'reports/report_ordem_servico.xml',
