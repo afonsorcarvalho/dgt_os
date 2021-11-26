@@ -1,0 +1,295 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- equiment.request : views -->
+        <record id="view_plantao_viagem_search" model="ir.ui.view">
+            <field name="name">dgt_os.plantao.viagem.search</field>
+            <field name="model">dgt_os.os.plantao.viagem</field>
+            <field name="arch" type="xml">
+                <search string="Procura de Plantão e Viagens">
+                    <field name="name"/>
+                    <field name="tecnico_id"/>
+                    <field name="data_inicio"/>
+                    <field name="data_fim"/>
+                    <field name="tipo"/>
+                   
+                    <separator/>
+                    <filter string="Plantões" domain="[('tipo', '=', 'plantao')]" name="plantao"/>
+                    <filter string="Viagens" domain="[('tipo', '=', 'viagem')]" name="viagem"/>
+                    
+                    <group expand='0' string='Agrupar por...'>
+                        <filter string="Tecnicos" name="tecnico_id" domain="[]" context="{'group_by' : 'tecnico_id'}"/>
+                        <filter string="Tipo" name="tipo" domain="[]" context="{'group_by' : 'tipo'}"/>
+                        <filter string="Data Início" name="data_inicio" domain="[]" context="{'group_by' : 'data_inicio'}"/>
+
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="plantao_viagem_view_form" model="ir.ui.view">
+            <field name="name">dgt_os.plantao.viagem.form</field>
+            <field name="model">dgt_os.os.plantao.viagem</field>
+            <field name="arch" type="xml">
+                <form string="Plantões e Viagens">
+                    <header>
+                        <button string="Confirmar" name="action_confirmar" type="object" attrs="{'invisible': [('state', '!=', 'draft')]}" /> 
+                        <button string="Provisorio" name="action_provisorio" type="object" attrs="{'invisible': [('state', '!=', 'cancelado')]}" /> 
+                        <button string="Aprovar" name="action_aprovar" type="object" 
+                            attrs="{'invisible': [('state', '!=', 'em_aprovacao')]}"
+                            groups="account.group_account_manager"
+                            /> 
+                        <button string="Cancelar" name="action_cancelar" type="object" attrs="{'invisible': ['|',('state', '=', 'aprovado'),('state', '=', 'cancelado'),('state', '=', 'draft')]}" /> 
+                        <!-- <button string="Reabrir Requisição" name="reset_equipment_request" type="object" attrs="{'invisible': [('archive', '=', False)]}"/>
+                        <button name="action_gera_os" type="object" string="Gerar OS" class="oe_highlight" attrs="{'invisible': [('stage_id', '!=', 'new')]}"/>-->
+                        <field name="state" widget="statusbar" statusbar_visible="draft,em_aprovacao,aprovado,cancelado" />
+                    </header>
+                    <sheet>
+                    
+                        
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only" string="Subject"/>
+                            <h1>
+                                <field name="name" />
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="tecnico_id" />
+                                <field name="data_inicio" />
+                                <field name="data_fim" />
+                                <field name="tipo" />
+                                <field name="description" />
+                            </group>
+                            <group>
+                                <field name="valor_total_diarias_a_pagar" />
+                                <field name="despesas_totais" />
+                                <field name="adiantamentos" />
+                                <field name="despesas_aprovadas" />
+                                <field name="pagar_restituir" />
+                             
+                                
+                                
+                            </group>
+                           
+                           
+                        </group>
+                        <group>
+                            <p class="alert alert-danger">Em caso de viagem é obrigatório colocar o relatório de serviço vinculado dentro do período da data de viagem.
+                            Se houver despesas, deverá ser colocado, em anexo, todos os comprovantes.
+                            Despesas sem comprovantes não serão aprovadas!</p>
+                        </group>
+                        <group>
+                            <notebook>
+                                <page string="Relatórios Vinculados">
+                                    <group>
+                                        <field name="relatorios_id" nolabel="1"
+                                        
+                                        domain="[('tecnicos_id', '=', tecnico_id),('data_atendimento', '&gt;=', data_inicio),('data_atendimento', '&lt;=', data_fim)]"
+                                        
+                                        >
+
+
+                               
+                                            <tree create="true" delete="true" edit="false" editable="bottom">
+                                                <field name="name"/>
+                                                <field name="os_id"/>
+                                                <field name="relatorio_num"/>
+                                                <field name="cliente_id"/>
+                                                <field name="data_atendimento"/>
+                                                <field name="hora_inicio"/>
+                                                <field name="hora_termino"/>
+                                                <field name="servico_executados"/>
+                                                <field name="time_execution"/>
+                                             
+                                             
+                                                
+                                            </tree>
+                                            <form create="true" delete="true" edit="false" editable="bottom">
+                                                <field name="name"/>
+                                                <field name="os_id"/>
+                                                <field name="relatorio_num"/>
+                                                <field name="cliente_id"/>
+                                                <field name="data_atendimento"/>
+                                                <field name="hora_inicio"/>
+                                                <field name="hora_termino"/>
+                                                <field name="servico_executados"/>
+                                                <field name="time_execution"/>
+    
+                                              
+                                                
+                                            </form>
+                                        </field>
+                                    </group>
+                                </page>
+                                <page string="Despesas">
+                                    <group>
+                                        <field name="despesas_line_id" nolabel="1">
+                                            <tree>
+                                                <field name="name"/>
+                                                <field name="data"/>
+                                                <field name="valor" string="Valor da Despesa"/>
+                                                <field name="valor_adiantamento" />
+                                                <field name="valor_aprovado" />
+                                                <field name="observacoes"/>
+                                                <field name="state"/>
+                                                <button string="Aprovar" name="action_aprovar" type="object" 
+                                               
+                                                groups="account.group_account_manager"
+                                                /> 
+
+                                            </tree>
+                                            <form>
+                                                <group>
+                                                    <field name="name"/>
+                                                    <field name="data"/>
+                                                    <field name="valor" string="Valor da Despesa"/>
+                                                    <field name="valor_adiantamento" />
+                                                    <field name="valor_aprovado" 
+                                                    groups="account.group_account_manager"
+                                                    attrs="{'readonly': False}"
+                                                    
+                                                    />
+                                                    <field name="observacoes"/>
+                                                    <field name="state"/>
+                                                </group>
+                                            </form>
+                                        </field>
+                                    </group>
+                                </page>
+                            </notebook>
+                            
+                           
+                            
+                        </group>
+                        
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="plantao_viagem_view_kanban" model="ir.ui.view">
+            <field name="name">dgt_os.plantao.viagem.kanban</field>
+            <field name="model">dgt_os.os.plantao.viagem</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="tipo" group_create="false">
+                    <field name="tipo"/>
+                    <field name="tecnico_id"/>
+                  
+                    <field name="data_inicio" />
+                    <field name="data_fim" />
+                 
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div >
+                                <div class="o_dropdown_kanban dropdown">
+                                    <a class="dropdown-toggle btn" data-toggle="dropdown" href="#">
+                                        <span class="fa fa-bars fa-lg"/>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                        <t t-if="widget.editable">
+                                            <a role="menuitem" type="edit" class="dropdown-item"> Editar...</a>
+                                        </t>
+                                        <t t-if="widget.deletable">
+                                            <a role="menuitem" type="delete" class="dropdown-item"> Apagar</a>
+                                        </t>
+                                    </ul>
+                                </div>
+                                <div class="oe_kanban_body">
+                                    <div>
+                                        <b>
+                                            <field name="name"/>
+                                        </b>
+                                        <br/>
+                                        <span name="tecnico_id" >
+                                            <field name="tecnico_id"/>
+                                            <br/>
+                                        </span>
+                                        
+                                    </div>
+                                </div>
+                                <div class="oe_kanban_footer">
+                                    
+                                   
+                                </div>
+                                <div class="oe_clear"></div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record id="plantao_viagem_view_tree" model="ir.ui.view">
+            <field name="name">dgt_os.plantao.viagem.tree</field>
+            <field name="model">dgt_os.os.plantao.viagem</field>
+            <field name="arch" type="xml">
+                <tree string="Plantões e Viagens" decoration-bf="message_needaction==True">
+                    <field name="message_needaction" invisible="1"/>
+                    <field name="name"/>
+                    <field name="description" />
+                    <field name="data_inicio" />
+                    <field name="data_fim" />
+                    <field name="tecnico_id" />
+                    <field name="tipo" />
+                    <field name="state" />
+                    
+                </tree>
+            </field>
+        </record>
+
+        <record id="plantao_viagem_view_graph" model="ir.ui.view">
+            <field name="name">dgt_os.plantao.viagem.graph</field>
+            <field name="model">dgt_os.os.plantao.viagem</field>
+            <field name="arch" type="xml">
+                <graph string="Plantões e Viagens">
+                    <field name="tecnico_id"/>
+                    <field name="tipo"/>
+                </graph>
+            </field>
+        </record>
+
+         <record id="hr_equipment_request_view_pivot" model="ir.ui.view">
+            <field name="name">dgt_os.plantao.viagem.pivot</field>
+            <field name="model">dgt_os.os.plantao.viagem</field>
+            <field name="arch" type="xml">
+                <pivot string="Plantões e Viagens">
+                    <field name="tecnico_id"/>
+                    <field name="tipo"/>
+                </pivot>
+            </field>
+        </record> 
+
+ 
+        <!-- <record id="hr_equipment_view_calendar" model="ir.ui.view">
+            <field name="name">dgt_os.plantao.viagem.calendar</field>
+            <field name="model">dgt_os.os.plantao.viagem</field>
+            <field name="arch" type="xml">
+                <calendar date_start="data_inicio">
+                    <field name="name"/>
+                    <field name="data_inicio" />
+                    <field name="data_fim" />
+                    <field name="tecnico_id"/>
+                    <field name="tipo"/>
+                </calendar>
+            </field>
+        </record>  -->
+
+        <record model="ir.actions.act_window" id="action_window_plantao_viagem">
+            <field name="name">Plantões e Viagens</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">dgt_os.os.plantao.viagem</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,pivot,graph</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+				Clique para criar uma novo Plantões e Viagens.
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>
