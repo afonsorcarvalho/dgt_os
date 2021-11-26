@@ -387,11 +387,16 @@ class DgtOs(models.Model):
     """
     @api.multi
     def update_parts_os(self):
+        _logger.info("Atualizando pecas requisitadas na os")
         for os in self:
+            _logger.info("OS")
+            _logger.info(os)
+            _logger.info("PROCURANDO RELATORIOS")
+            _logger.info(os.relatorios)
             for relatorio in os.relatorios:
-                if relatorio.state != 'done':
+
                     parts_request = relatorio.parts_request
-                    _logger.debug("Atualizando Pecas equisitadas na OS")
+                    _logger.debug("Atualizando Pecas Requisitadas na OS")
                     _logger.debug(parts_request)
 
                     for parts in parts_request:
@@ -679,9 +684,13 @@ class DgtOs(models.Model):
         type_report = 'quotation'
         relatorio_servico = self.env['dgt_os.os.relatorio.servico'].search(
             [('os_id', '=', self.id), ('type_report', '=', type_report), ('state', '=', 'draft')])
+        _logger.info("RELATORIOS DE SERVIÇOS ACHADOS")
+        _logger.info(relatorio_servico)
+
         if len(relatorio_servico) > 0:
             raise UserError(
                     _("Antes de finalizar você precisa concluir relatório de orçamento. "))
+        self.update_parts_os()
                             
     def set_agente_commission(self):
         _logger.debug("pegando agente comissão")
