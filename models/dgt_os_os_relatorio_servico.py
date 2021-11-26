@@ -252,22 +252,3 @@ class PecasRequisitionLine(models.Model):
 
     ] 
     
-class PecasAplicationLine(models.Model):
-
-    _name = 'dgt_os.os.pecas.aplication.line'
-    parts_request = fields.Many2one(
-        'dgt_os.os.pecas.line', 'Pecas Aplicadas',
-        copy=True)
-    relatorio_aplication_id = fields.Many2one(
-        'dgt_os.os.relatorio.servico',
-        string='RAT Aplicado',
-        )
-    os_id = fields.Many2one(
-        'dgt_os.os', 'Ordem de serviço',
-        index=True, ondelete='cascade')
-
-    _sql_constraints = [
-
-        ('parts_uniq', 'unique (parts_request)', 'A mesma peça foi aplicada mais de uma vez !')
-
-    ]
