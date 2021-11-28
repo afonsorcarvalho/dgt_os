@@ -246,11 +246,11 @@ class PecasRequisitionLine(models.Model):
         index=True, ondelete='cascade')
     
 
-    _sql_constraints = [
+   # _sql_constraints = [
 
-         ('parts_uniq_request', 'unique (parts_request,relatorio_id)', 'A mesma peça foi requisitada mais de uma vez !')
+   #      ('parts_uniq_request', 'unique (parts_request,dgt_id)', 'A mesma peça foi requisitada mais de uma vez !')
 
-     ] 
+    # ] 
     
 class PecasAplicationLine(models.Model):
 
