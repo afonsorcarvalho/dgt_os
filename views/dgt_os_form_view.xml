@@ -133,6 +133,8 @@
 													<field name="aplicada" string="Status" />
 													<field name="product_id" />
 													<field name="name" />
+													<field name='relatorio_parts_id'/>
+													<field name='relatorio_request_id'/>
 												</group>
 												<group>
 													<field name="qty_available" string="Qtd Disp." />
@@ -147,10 +149,13 @@
 										<field name="aplicada" />
 										<field name="product_id" />
 										<field name="name" />
+
 										<field name="lot_id" domain="[('product_id', '=', product_id)]" context="{'default_product_id': product_id}" groups="stock.group_production_lot" />
 										<field name="qty_available" string="Qtd Disp." />
 										<field name="product_uom_qty" string="Quantity" />
 										<field name="product_uom" string="Unit of Measure" groups="product.group_uom" />
+				
+
 									</tree>
 								</field>
 								<div class="oe_clear" />

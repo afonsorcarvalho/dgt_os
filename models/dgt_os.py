@@ -375,7 +375,7 @@ class DgtOs(models.Model):
     @api.onchange('relatorios')
     def onchange_relatorios(self):
         _logger.debug('Onchange Relatórios')
-        self.update_parts_os()
+        #self.update_parts_os()
     
     @api.multi
     def verify_on_add_relatorios(self):
@@ -388,39 +388,44 @@ class DgtOs(models.Model):
     @api.multi
     def update_parts_os(self):
         _logger.info("Atualizando pecas requisitadas na os")
-        for os in self:
-            _logger.info("OS")
-            _logger.info(os)
-            _logger.info("PROCURANDO RELATORIOS")
-            _logger.info(os.relatorios)
-            for relatorio in os.relatorios:
+        #for os in self:
+        _logger.info("OS")
+        _logger.info(self)
+        _logger.info("PROCURANDO RELATORIOS")
+        _logger.info(self.relatorios)
+        for relatorio in self.relatorios:
 
-                    parts_request = relatorio.parts_request
-                    _logger.debug("Atualizando Pecas Requisitadas na OS")
-                    _logger.debug(parts_request)
+                parts_request = relatorio.parts_request
+                _logger.debug("Atualizando Pecas Requisitadas na OS")
+                _logger.debug(parts_request)
 
-                    for parts in parts_request:
-                        pecas_line = self.env['dgt_os.os.pecas.line'].search([('relatorio_parts_id', '=', parts.id)])
+                for parts in parts_request:
+                    _logger.debug(parts.parts_request.display_name)
+                    pecas_line = self.env['dgt_os.os.pecas.line'].search([('relatorio_parts_id', '=', parts.id)])
+                    _logger.debug(pecas_line)
+                    if len(pecas_line) == 0:
+                        _logger.debug("Ainda não foi adicionada a peça do relatorio na OS")
                         _logger.debug(pecas_line)
-                        if len(pecas_line) ==  0:
-                            _logger.debug("Ainda não foi adicionada a peça do relatorio na OS")
-                            _logger.debug(os.name)
-                            res = os.pecas.create({
-                                    'os_id' : os.id,
-                                    'product_id': parts.parts_request.id,
-                                    'name': parts.parts_request.display_name,
-                                    'relatorio_parts_id': parts.id,
-                                    'product_id': parts.parts_request.id,
-                                    'product_uom_qty': parts.product_uom_qty,
-                                    'product_uom': parts.parts_request.uom_id.id,
-                                    'relatorio_request_id': relatorio.id,
-                                    
-                                })
-                            
-                            _logger.debug(res)
-                            
-                        else:
-                            _logger.debug("Peça já adicionada. Atualizando ... ")
+                        _logger.debug(self.name)
+                        vals = {              
+                            'os_id': self.id,
+                            'name': parts.parts_request.display_name,
+                            'relatorio_parts_id': parts.id,
+                            'product_id': parts.parts_request.id,
+                            'product_uom_qty': parts.product_uom_qty,
+                            'product_uom': parts.parts_request.uom_id.id,
+                            'relatorio_request_id': relatorio.id,
+                        }
+                        self.pecas = [(0,0,vals)]
+                    else:
+                        _logger.debug("Peca já adicionada!!!")
+                        _logger.debug(pecas_line.name)
+                        _logger.debug(pecas_line)
+                        
+                        
+                    
+                        
+                    
                     
             
 

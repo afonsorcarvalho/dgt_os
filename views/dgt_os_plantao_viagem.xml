@@ -54,22 +54,21 @@
                             </h1>
                         </div>
                         <group>
-                            <group>
+                            <group string="Dados">
                                 <field name="tecnico_id" />
-                                <field name="data_inicio" />
-                                <field name="data_fim" />
-                                <field name="tipo" />
                                 <field name="description" />
+                                <field name="tipo" />
                             </group>
-                            <group>
+                            <group string="Valores">
                                 <field name="valor_total_diarias_a_pagar" />
                                 <field name="despesas_totais" />
                                 <field name="adiantamentos" />
                                 <field name="despesas_aprovadas" />
                                 <field name="pagar_restituir" />
-                             
-                                
-                                
+                            </group>
+                            <group string="Datas">
+                                <field name="data_inicio" />
+                                <field name="data_fim" />
                             </group>
                            
                            
