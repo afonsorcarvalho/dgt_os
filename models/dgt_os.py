@@ -791,6 +791,7 @@ class DgtOs(models.Model):
     #  - fazer atualização do orçamento ao mudar alguma coisa de peças e serviços na Ordem de serviço
     #
     def gera_orcamento(self):
+        self.sudo()
         if self.filtered(lambda dgt_os: dgt_os.gerado_cotacao == True):
             raise UserError(
                 _("Cotação para esse Ordem de serviço já foi gerada"))
@@ -908,7 +909,7 @@ class DgtOs(models.Model):
             _logger.debug("Adicionando linhas de pecas:")
             for peca in self.pecas:
 
-                saleline = self.env['sale.order.line'].create({
+                saleline = self.env['sale.order.line'].sudo().create({
 
                     'order_id': saleorder.id,
                     'product_id': peca.product_id.id,
@@ -940,7 +941,7 @@ class DgtOs(models.Model):
         # TODO Pegar do contrato o serviço product_id caso tenha configurado no contrato
         for servico in self.servicos:
             _logger.info("adicionando linhas:")
-            saleline = self.env['sale.order.line'].create({
+            saleline = self.env['sale.order.line'].sudo().create({
 
                 'order_id': saleorder.id,
                 'product_id': servico.product_id.id,
