@@ -74,9 +74,21 @@
                            
                         </group>
                         <group>
+                            <p class="alert alert-danger">Os cálculos das diárias são feitos da seguinte maneira: 50% do valor do salário dividido por 30.
+                                Ex. Salário de R$ 1100,00, sera (1100/30)*0,5 = R$ 18,33 (valor da diaria). 
+                                Caso tenha sido plantão sem atendimento será pago 50% da diária, se houver atendimento 100% da diária.
+                                Caso seja um dia de sábado será pago 25% da diária sem atendimento e 50% se houver atendimenteo.
+                                Para saber se houve atendimento, deverá ser colocado o relatório correspondente em relatórios vinculados.
+
+                            </p>
+                        </group>
+                        <group>
                             <p class="alert alert-danger">Em caso de viagem é obrigatório colocar o relatório de serviço vinculado dentro do período da data de viagem.
                             Se houver despesas, deverá ser colocado, em anexo, todos os comprovantes.
-                            Despesas sem comprovantes não serão aprovadas!</p>
+                            Despesas sem comprovantes não serão aprovadas!
+                            Será pago 100% da diária na viagem.
+                        
+                        </p>
                         </group>
                         <group>
                             <notebook>
