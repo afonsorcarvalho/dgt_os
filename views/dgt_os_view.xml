@@ -49,7 +49,9 @@
 			<tree   string="Ordens de Serviço"
 				default_order="name desc"
 				decoration-danger="maintenance_type =='corrective'"
-				decoration-info="maintenance_type == 'preventive'">
+				decoration-info="maintenance_type == 'preventive'"
+				create="false"
+				>
 
 			  <field name="state" string="Status"/> 
 			  <field name="create_date" string="Data Criação"/>

@@ -21,6 +21,7 @@ class DgtOs(models.Model):
         ('under_budget', 'Em Orçamento'),
         ('pause_budget', 'Orçamento Pausado'),
         ('wait_authorization', 'Esperando aprovação'),
+        ('wait_parts', 'Esperando peças'),
         ('execution_ready', 'Pronta para Execução'),
         ('under_repair', 'Em execução'),
         ('pause_repair', 'Execução Pausada'),
@@ -540,6 +541,7 @@ class DgtOs(models.Model):
             ('state', '!=', 'done'),
             ('state', '!=', 'reproved'),
             ('state', '!=', 'wait_authorization'),
+            ('state', '!=', 'wait_parts'),
             ('id', '!=', self.id),
         ]
         result = self.env['dgt_os.os'].search(domain)
@@ -583,6 +585,11 @@ class DgtOs(models.Model):
         self.message_post(body='Reprovado o orçamento da ordem de serviço!')
         if self.state != 'reproved':
             res = self.write({'state': 'reproved'})
+        return res
+    @api.multi
+    def action_wait_parts(self):
+        self.message_post(body='Esperando peças chegar no estoque!')
+        res = self.write({'state': 'wait_parts'})
         return res
 
     @api.multi

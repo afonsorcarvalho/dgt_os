@@ -28,6 +28,7 @@ class DgtOsRequest(models.Model):
 	oss = fields.One2many(
 		'dgt_os.os', 'request_id', 'Ordens de Serviço',
 		copy=True, readonly=False, required=False) 
+	os_gerada = fields.Boolean("OS gerada", default=False)
 	cliente_id = fields.Many2one(
 		'res.partner', 'Cliente',
 		index=True, required=True,
@@ -51,6 +52,8 @@ class DgtOsRequest(models.Model):
 
 	@api.multi
 	def archive_equipment_request(self):
+		if self.os_gerada:
+			raise UserError(_("Não pode ser cancelada solicitação com OS gerada!"))
 		self.write({'archive': True})
 
 	@api.multi
@@ -66,8 +69,11 @@ class DgtOsRequest(models.Model):
 	
 	@api.multi
 	def action_gera_os(self):
+		if not self.tecnicos:
+			raise UserError(_("Para gerar OS é necessário o campo Técnico preenchido"))
 		args = self.company_id and [('company_id', '=', self.company_id.id)] or []
 		warehouse = self.env['stock.warehouse'].search(args, limit=1)
+		
 		equipments = self.equipments
 		
 		for line in equipments:
@@ -86,7 +92,12 @@ class DgtOsRequest(models.Model):
 					}
 			self.env['dgt_os.os'].create(vals)
 			
-		self.write({'stage_id': 'in_progress'})
+		self.write({
+			'stage_id': 'in_progress',
+			'os_gerada': True,
+		
+			})
+
 		return True
 
 	@api.multi

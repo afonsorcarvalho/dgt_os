@@ -3,15 +3,16 @@
 	<data>
 		<record model="ir.ui.view" id="dgt_os_form_view">
 			<field name="arch" type="xml">
-				<form string="Ordens de Serviço">
+				<form string="Ordens de Serviço" create="false">
 					<header>
 						<button name="action_done" type="object" string="Concluir OS" class="oe_highlight" attrs="{'invisible':True}" />
 						<!-- <button name="action_agente" type="object" string="Testar agente" class="oe_highlight" /> -->
 						<button name="action_quotation_start" type="object" string="Iniciar Orçamento" class="oe_highlight" attrs="{'invisible':[('state', 'not in',('draft','pause_budget'))]}" />
-						<button name="action_repair_executar" type="object" string="Iniciar Execução" class="oe_highlight" attrs="{'invisible':[('state', 'not in',('execution_ready','pause_repair'))]}" />
+						<button name="action_repair_executar" type="object" string="Iniciar Execução" class="oe_highlight" attrs="{'invisible':[('state', 'not in',('execution_ready','wait_parts', 'pause_repair'))]}" />
 						<button name="action_quotation_end" type="object" class="oe_highlight" string="Finalizar Orçamento" attrs="{'invisible':[('state', 'not in',('under_budget'))]}" />
 						<button name="action_quotation_pause" type="object" string="Pausar Orçamento" attrs="{'invisible':[('state', 'not in',('under_budget'))]}" />
 						<button name="action_repair_pause" type="object" string="Pausar Execução" attrs="{'invisible':[('state', 'not in',('under_repair'))]}" />
+						<button name="action_wait_parts" type="object" string="Esperar peças" attrs="{'invisible':[('state', 'not in',('execution_ready'))]}" />
 						<button name="force_parts_reservation" states="released" string="Forçar Reserva" type="object" />
 						<button name="action_repair_end" states="under_repair" type="object" string="Finalizar Execução" class="oe_highlight" attrs="{'invisible':[('state', 'not in',('under_repair'))]}" />
 						<button name="action_repair_aprove" string="Aprovar" type="object" groups="base.group_no_one" attrs="{'invisible':[('state', 'not in',('wait_authorization'))]}" />
