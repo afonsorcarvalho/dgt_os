@@ -201,30 +201,40 @@ class DgtOsPlantaoViagem(models.Model):
 			date_current = data_inicio + relativedelta(days=+seq)
 			_logger.debug(date_current)
 			porcentagem_diaria = 0
-			for relatorio in relatorios_ids:
-				if relatorio.data_atendimento == date_current:
-					_logger.debug("TEM RELATORIO NESTA DATA")
-					if date_current.weekday() == 5: 
-						_logger.debug("É sabado")
+			if len(relatorios_ids) > 0:
+				_logger.debug("TEM RELATORIO NESTA DATA")
+				for relatorio in relatorios_ids:
+					if relatorio.data_atendimento == date_current:
 						
-						if relatorio.hora_termino > 12:
-							_logger.debug("Horario de termino do serviço é depois do 12:00hs")
-							porcentagem_diaria = 0.5
-							break
+						if date_current.weekday() == 5: 
+							_logger.debug("É sabado")
+							
+							if relatorio.hora_termino > 12:
+								_logger.debug("Horario de termino do serviço é depois do 12:00hs")
+								porcentagem_diaria = 0.5
+								break
+							else:
+								_logger.debug("Horario de termino do serviço é antes das 12:00hs")
+								porcentagem_diaria = 0.25
 						else:
-							_logger.debug("Horario de termino do serviço é antes das 12:00hs")
-							porcentagem_diaria = 0.25
+							_logger.debug("Não é sabado")
+							porcentagem_diaria = 1
+							break
 					else:
-						_logger.debug("Não é sabado")
-						porcentagem_diaria = 1
-						break
+						_logger.debug("NÃO TEM RELATORIO NESTA DATA")
+						if date_current.weekday() == 5: 
+							_logger.debug("MAS É SABADO")
+							porcentagem_diaria = 0.25	
+						else:
+							porcentagem_diaria = 0.5	
+			else:
+				_logger.debug("NÃO TEM RELATORIO NESTA DATA")
+				if date_current.weekday() == 5: 
+					_logger.debug("MAS É SABADO")
+					porcentagem_diaria = 0.25	
 				else:
-					_logger.debug("NÃO TEM RELATORIO NESTA DATA")
-					if date_current.weekday() == 5: 
-						_logger.debug("MAS É SABADO")
-						porcentagem_diaria = 0.25	
-					else:
-						porcentagem_diaria = 0.5	
+					porcentagem_diaria = 0.5	
+
 								
 			days_diarias.append({
 						'date': date_current,
