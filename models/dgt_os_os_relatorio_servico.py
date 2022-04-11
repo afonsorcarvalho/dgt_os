@@ -1,4 +1,5 @@
 
+from itertools import product
 import time
 from datetime import date, datetime, timedelta
 from odoo.addons import decimal_precision as dp
@@ -258,6 +259,13 @@ class PecasAplicationLine(models.Model):
     parts_request = fields.Many2one(
         'dgt_os.os.pecas.line', 'Pecas Aplicadas',
         copy=True)
+    product_uom_qty = fields.Float(
+		'Qtd', default=1.0,
+		digits=dp.get_precision('Product Unit of Measure'),  
+        related='parts_request.product_uom_qty',
+        readonly=True,
+        store=True
+        )
     relatorio_aplication_id = fields.Many2one(
         'dgt_os.os.relatorio.servico',
         string='RAT Aplicado',
