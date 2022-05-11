@@ -18,6 +18,11 @@ access_dgt_os_os_plantao_viagem_despesas_manager,access_dgt_os_os_plantao_viagem
 access_dgt_os_os_pecas_line_manager,access.dgt_os.os.pecas.line.manager,model_dgt_os_os_pecas_line,group_at_manager,1,1,1,1
 access_dgt_os_os_pecas_line_tecnico,access.dgt_os.os.pecas.line.tecnico,model_dgt_os_os_pecas_line,base.group_user,1,1,1,1
 
+access_dgt_os_os_pictures_manager,dgt_os.dgt_os.os.pictures.manager,model_dgt_os_os_pictures,group_at_manager,1,1,1,1
+access_dgt_os_os_pictures_tecnico,dgt_os.dgt_os.os.pictures.tecnico,model_dgt_os_os_pictures,base.group_user,1,1,1,1
+
+
+
 access_dgt_os_os_servicos_line_manager,access.dgt_os.os.servicos.line.manager,model_dgt_os_os_servicos_line,group_at_manager,1,1,1,0
 access_dgt_os_os_relatorio_servico_manager,access.dgt_os.os.relatorio.servico.manager,model_dgt_os_os_relatorio_servico,group_at_manager,1,1,1,0
 access_dgt_os_os_relatorio_atendimento_line_manager,access.dgt_os.os.relatorio.atendimento.line.manager,model_dgt_os_os_relatorio_atendimento_line,group_at_manager,1,1,1,0

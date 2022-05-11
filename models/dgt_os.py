@@ -289,6 +289,8 @@ class DgtOs(models.Model):
         string=u'Cotação gerada?',
     )
 
+    picture_ids = fields.One2many('dgt_os.os.pictures', 'os_id', "fotos")
+
     def set_sign_client(self):
         self.sign_client = 1
 
@@ -1076,7 +1078,24 @@ class DgtOs(models.Model):
 
             self.check_list_created = True
 
+class OsPictures(models.Model):
+    _name = 'dgt_os.os.pictures'
+    _description = "Fotos do atendimento"
 
+    name = fields.Char('Título da foto')
+    description = fields.Text('Descrição da foto')
+
+    
+    os_id = fields.Many2one(
+        string='Os', 
+        comodel_name='dgt_os.os', 
+        required=True, 
+       
+    )
+
+    picture = fields.Binary(string="Foto", 
+    required=True
+     )
 class ServicosLine(models.Model):
     _name = 'dgt_os.os.servicos.line'
     _description = 'Servicos Line'

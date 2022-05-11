@@ -198,6 +198,46 @@
 									</tree>
 								</field>
 							</page>
+							<page string="Fotos">
+								<group>
+								  <field name="picture_ids" nolabel="1">
+									<kanban>
+									  <templates>
+										<t t-name="kanban-box">
+										  <div class="oe_kanban_global_click o_kanban_record_has_image_fill o_hr_kanban_record">
+											<field name="picture" widget="image" class="oe_avatar" options="{'size': [90,'100%']}"/>
+											<div class="oe_kanban_details">
+											  <div class="o_kanban_record_top">
+												
+												  <div class="o_kanban_record_title">
+													<!-- <div class="float-right"> -->
+													  
+													  <b><field name="name"/></b>
+													<!-- </div> -->
+												  </div>
+												 
+												
+											  </div> 
+											  <div class="o_kanban_record_body">
+													  <field name="description"/>
+												  </div>
+											</div>
+										  </div>
+										</t>
+									  </templates>
+									</kanban>
+									<form>
+									  <sheet>
+										<group>
+										  <field name="name" />
+										  <field name="description" />
+										  <field name="picture" widget="image"  />
+										</group>
+									  </sheet>
+									</form>
+								  </field>
+								</group>
+							  </page>
 							<page string="Assinatura" attrs="{'invisible':[('state','=','draft')]}">
 								<group>
 									<field name="name_digital_signature_client" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}" />

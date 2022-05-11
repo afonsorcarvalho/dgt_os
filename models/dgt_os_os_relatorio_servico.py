@@ -198,6 +198,7 @@ def write(self, values):
 class RelatoriosAtendimentoLines(models.Model):
     # TODO remover esse model e fazer a migração dos dados
     _name = "dgt_os.os.relatorio.atendimento.line"
+    
 
     name = fields.Char('Item', readonly=True)
 
