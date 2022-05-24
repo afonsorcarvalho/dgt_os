@@ -11,7 +11,11 @@ class DgtOsPecasLine(models.Model):
 	_description = u'Ordem de Serviço Peças Planejadas Line'
 	_order = 'os_id, sequence, id'
 	
-	name = fields.Char('Descrição', size=64)
+	name = fields.Char(
+    related='product_id.name',
+    readonly=True,
+    store=True
+    )
 	os_id = fields.Many2one(
 		'dgt_os.os', 'Repair Order Reference',
 		index=True, ondelete='cascade')
