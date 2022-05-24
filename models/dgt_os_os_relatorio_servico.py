@@ -232,6 +232,11 @@ class PecasRequisitionLine(models.Model):
 
     _name = 'dgt_os.os.pecas.requisition.line'
     parts_request = fields.Many2one('product.product', u'Peças', required=True)
+    name = fields.Char(
+    related='parts_request.name',
+    readonly=True,
+    store=True
+    )
     product_uom_qty = fields.Float(
 		'Qtd', default=1.0,
 		digits=dp.get_precision('Product Unit of Measure'), required=True)
@@ -261,7 +266,7 @@ class PecasAplicationLine(models.Model):
         'dgt_os.os.pecas.line', 'Pecas Aplicadas',
         copy=True)
     name = fields.Char(
-    related='parts_request.name',
+    related='parts_request.product_id.name',
     readonly=True,
     store=True
     )
