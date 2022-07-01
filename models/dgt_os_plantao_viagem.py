@@ -1,4 +1,5 @@
 ﻿# -*- coding: utf-8 -*-
+from sqlite3 import Date
 import time
 from datetime import datetime,timedelta
 from dateutil.relativedelta import *
@@ -33,6 +34,7 @@ class DgtOsPlantaoViagem(models.Model):
                        readonly=True, index=True, default=lambda self: _('New'))
 	@api.model
 	def create(self, vals):
+		
 		if vals.get('name', _('New')) == _('New'):
 			if 'company_id' in vals:
 				vals['name'] = self.env['ir.sequence'].with_context(force_company=vals['company_id']).next_by_code('dgt_os.os.plantao.viagem') or _('New')
@@ -293,6 +295,12 @@ class DgtOsPlantaoViagem(models.Model):
 	def action_confirmar(self):
 		
 		for record in self:
+			date_today = fields.date.today()
+			if record.data_fim.month != date_today.month: 
+				raise UserError(
+                	_('A data final deverá está neste mês corrente.'))
+
+
 			if record.tipo == 'plantao':
 				record.set_state_em_aprovacao()
 			else:

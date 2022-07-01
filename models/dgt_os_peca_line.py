@@ -72,6 +72,9 @@ class DgtOsPecasLine(models.Model):
 		
 	def action_aplicar_pecas(self):
 		_logger.info("aplicando peças:")
+		self.write({
+			'aplicada': True
+		})
   
 	
 	@api.onchange('os_id', 'product_id', 'product_uom_qty')
