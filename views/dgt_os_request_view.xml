@@ -9,6 +9,7 @@
                 <search string="Solicitação de Manutenção Search">
                     <field name="name"/>
                     <field name="tecnicos"/>
+                    <field name="company_id" /> 
                     <field name="equipments"/>
                     <field name="stage_id"/>
                     <field name="maintenance_team_id"/>
@@ -60,6 +61,7 @@
                         </div>
                         <group>
                             <group>
+                                <field name="company_id" /> 
                                 <field name="cliente_id" attrs="{'readonly': [('stage_id','!=','new')]}" />
                                 <field name="equipments" widget="many2many_tags" attrs="{'readonly': [('stage_id','!=','new')]}" domain="[('client_id.id', '=', cliente_id)]" />
                                 <field name="request_date" attrs="{'readonly': [('stage_id','!=','new')]}" groups="base.group_no_one"/>

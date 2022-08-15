@@ -92,6 +92,13 @@ class DgtOs(models.Model):
     sequence = fields.Integer(string='Sequence', default=10)
     name = fields.Char(string='OS. N', required=True, copy=False,
                        readonly=True, index=True, default=lambda self: _('New'))
+    
+    company_id = fields.Many2one(
+        string='Empresa', 
+        comodel_name='res.company', 
+        required=True, 
+        default=lambda self: self.env.user.company_id
+    )
 
     origin = fields.Char('Source Document', size=64, readonly=True, states={'draft': [('readonly', False)]},
                          help="Referencia ao documento que gerou a ordem de servico.")

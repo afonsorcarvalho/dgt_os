@@ -24,6 +24,13 @@ class DgtOsRequest(models.Model):
 		copy=False, required=True,readonly=True)
 	description = fields.Text('Descrição', required=True)
 	contact_os = fields.Char('Requisitante', required=True)
+	
+	company_id = fields.Many2one(
+        string='Empresa', 
+        comodel_name='res.company', 
+        required=True, 
+        default=lambda self: self.env.user.company_id
+    )
 	request_date = fields.Date('Data da Solicitação', track_visibility='onchange', default=fields.Date.context_today)
 	oss = fields.One2many(
 		'dgt_os.os', 'request_id', 'Ordens de Serviço',
