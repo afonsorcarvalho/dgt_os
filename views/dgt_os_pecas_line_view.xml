@@ -20,6 +20,7 @@
 			<field name="arch" type="xml">
 				<tree string="Linhas de Pecas de O.S.">
 					<field name="aplicada" string="Aplicada"/>
+					<field name="not_aproved" string="Não aprovada"/>
 					<field name="name"/>
 					<field name="create_date"/>
 					

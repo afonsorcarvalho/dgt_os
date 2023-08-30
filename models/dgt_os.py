@@ -655,10 +655,10 @@ class DgtOs(models.Model):
 
         # verificando se pecas foram aplicadas
         for p in self.pecas:
-            if not p.aplicada:
+            if not p.aplicada and not p.not_aproved:
                 raise UserError(
                     _("Para finalizar O.S. todas as peças devem ser aplicadas"))
-                return False
+                
         # if self.check_list_created:
         for check in self.check_list:
             if not check.check:

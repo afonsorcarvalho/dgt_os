@@ -149,7 +149,13 @@ class RelatoriosServico(models.Model):
         _logger.debug("APLICANDO PEÇAS")
         pecas_aplicadas = self.parts_application
         for peca in pecas_aplicadas:
-            peca.parts_request.write({'aplicada':True})
+            if peca.not_aproved:
+                peca.parts_request.write({
+                    'aplicada':False,
+                    'not_aproved': True,
+                })
+            else:
+                peca.parts_request.write({'aplicada':True})
             _logger.debug(peca.parts_request.id)
             _logger.debug(peca.parts_request.aplicada)
 
@@ -270,6 +276,7 @@ class PecasAplicationLine(models.Model):
     readonly=True,
     store=True
     )
+    not_aproved = fields.Boolean("Não aprovada")
     product_uom_qty = fields.Float(
 		'Qtd', default=1.0,
 		digits=dp.get_precision('Product Unit of Measure'),  

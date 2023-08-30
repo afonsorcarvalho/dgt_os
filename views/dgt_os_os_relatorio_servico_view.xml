@@ -111,6 +111,7 @@
 							<field name="parts_application" nolabel="1" attrs="{'readonly':[('state','!=', 'draft'),('state','!=', 'under_budget'),('state','!=', 'under_repair')]}" context="{'default_relatorio_aplication_id': id,'default_os_id':os_id }">
 								<tree string="Peças aplicadas" editable="bottom">
 									<field name="parts_request" domain="[('os_id', '=', os_id),('aplicada','=', False) ]" options="{'no_create_edit': True}" required="1" />
+									<field name="not_aproved"/>
 									<field name="relatorio_aplication_id" required="1" />
 									<field name="os_id" required="1" />
 								</tree>

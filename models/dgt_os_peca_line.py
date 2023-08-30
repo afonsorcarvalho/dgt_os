@@ -26,6 +26,7 @@ class DgtOsPecasLine(models.Model):
 		'dgt_os.os.pecas.requisition.line', 'Id peça requisitada',
 		index=True)
 	aplicada = fields.Boolean('Aplicada', copy=False)
+	not_aproved = fields.Boolean('Não Autorizada', copy=False)
 	to_invoice = fields.Boolean('Faturar')
 	product_id = fields.Many2one('product.product', u'Peças', required=True)
 	invoiced = fields.Boolean('Faturada', copy=False, readonly=True)
