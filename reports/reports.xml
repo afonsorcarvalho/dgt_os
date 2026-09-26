@@ -19,7 +19,7 @@
 
 
         <!-- QWeb Reports -->
-    <!--    <report 
+    <!--    <report
             id="ordem_servico_report"
             model="dgt_os.os"
             string="Ordem de Serviço"
@@ -31,7 +31,7 @@
             attachment="(object.name + '.pdf')"
         />
 
-		<report 
+		<report
             id="orcamento_servico_report"
             model="dgt_os.os"
             string="Orçamento de Serviço"
@@ -42,6 +42,34 @@
         />
 
        -->
+
+        <record id="paperformat_os_campo" model="report.paperformat">
+            <field name="name">OS Campo A4</field>
+            <field name="default" eval="False"/>
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">8</field>
+            <field name="margin_bottom">14</field>
+            <field name="margin_left">7</field>
+            <field name="margin_right">7</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">0</field>
+            <!-- 75 dpi: wkhtmltopdf sai 1:1, pt/mm do CSS = tamanho impresso -->
+            <field name="dpi">75</field>
+        </record>
+
+        <report
+            id="ordem_servico_campo_report"
+            model="dgt_os.os"
+            string="Ordem de Serviço (Campo)"
+            report_type="qweb-pdf"
+            paperformat="paperformat_os_campo"
+            name="dgt_os.report_ordem_servico_campo"
+            file="dgt_os.report_ordem_servico_campo"
+            print_report_name="('OS Campo - ' + object.name)"
+        />
     </data>
 </odoo>
 

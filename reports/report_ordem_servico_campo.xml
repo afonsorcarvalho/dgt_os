@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<!--
+    Relatório "Ordem de Serviço (Campo)": só Cliente e Equipamento vêm
+    preenchidos do sistema. O resto fica em branco pro técnico preencher
+    à mão no atendimento, pra depois dar entrada no sistema.
+-->
+<template id="dgt_os.report_ordem_servico_campo">
+    <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-set="title">ORDEM DE SERVIÇO - RELATÓRIO DE CAMPO</t>
+            <t t-set="form_version">V1.2</t>
+            <t t-call="dgt_os.report_campo_layout">
+                <t t-call="dgt_os.report_campo_cliente_equipamento"/>
+
+                <div class="osc-sec">Atendimento</div>
+                <table class="osc-opt" style="margin-bottom: 1mm;">
+                    <tr>
+                        <td><span class="osc-box"/>Corretiva</td>
+                        <td><span class="osc-box"/>Preventiva</td>
+                        <td><span class="osc-box"/>Instalação</td>
+                        <td><span class="osc-box"/>Calibração</td>
+                        <td><span class="osc-box"/>Treinamento</td>
+                        <td style="width: 32%;"><span class="osc-box"/>Outro: ______________________</td>
+                    </tr>
+                </table>
+
+                <t t-call="dgt_os.report_campo_execucao"/>
+
+                <div class="osc-sec">Problema relatado / serviço solicitado</div>
+                <table class="osc-ruled">
+                    <tr t-foreach="range(3)" t-as="i"><td>&#160;</td></tr>
+                </table>
+
+                <div class="osc-sec">Diagnóstico / serviço executado</div>
+                <table class="osc-ruled">
+                    <tr t-foreach="range(5)" t-as="i"><td>&#160;</td></tr>
+                </table>
+
+                <div class="osc-sec">Peças utilizadas</div>
+                <table class="osc-parts">
+                    <thead>
+                        <tr>
+                            <th style="width: 22%;">Código</th>
+                            <th>Descrição</th>
+                            <th style="width: 12%; text-align: center;">Qtd.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="range(4)" t-as="i"><td>&#160;</td><td>&#160;</td><td>&#160;</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="osc-sec">Pendências / observações</div>
+                <table class="osc-ruled">
+                    <tr t-foreach="range(2)" t-as="i"><td>&#160;</td></tr>
+                </table>
+
+                <t t-call="dgt_os.report_campo_assinaturas"/>
+            </t>
+        </t>
+    </t>
+</template>
+</odoo>
