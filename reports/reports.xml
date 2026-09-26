@@ -56,8 +56,8 @@
             <field name="margin_right">7</field>
             <field name="header_line" eval="False"/>
             <field name="header_spacing">0</field>
-            <!-- 75 dpi: wkhtmltopdf sai 1:1, pt/mm do CSS = tamanho impresso -->
-            <field name="dpi">75</field>
+            <!-- 90 dpi: impresso sai ~83% do CSS (75 dpi seria 1:1); validado em papel -->
+            <field name="dpi">90</field>
         </record>
 
         <report
