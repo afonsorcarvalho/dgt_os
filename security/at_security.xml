@@ -27,5 +27,17 @@
 			<field name="groups" eval="[(4,ref('group_at_manager'))]"/>
 			<field name="domain_force">[(1,'=',1)]</field>
 		</record>
+		<record model="ir.rule" id="dgt_os_os_company_rule">
+			<field name="name">OS: multi-empresa</field>
+			<field name="model_id" ref="model_dgt_os_os"/>
+			<field name="global" eval="True"/>
+			<field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+		</record>
+		<record model="ir.rule" id="dgt_os_os_request_company_rule">
+			<field name="name">Solicitação de OS: multi-empresa</field>
+			<field name="model_id" ref="model_dgt_os_os_request"/>
+			<field name="global" eval="True"/>
+			<field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+		</record>
 	</data>
 </odoo>
